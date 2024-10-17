@@ -1,0 +1,83 @@
+version: "1.0"
+
+# Databases
+databases:
+  - okonomimodell:
+      shared: no
+      owner: sysadmin
+      schemas:
+        - stages
+        - intermediates
+        - marts
+        - oebs
+        - meta
+
+# Roles
+roles:
+  - okonomimodell_transformer:
+      warehouses:
+        - okonomimodell_transformer
+      privileges:
+        databases:
+          read:
+            - okonomimodell
+        schemas:
+          read:
+            - okonomimodell.stages
+            - okonomimodell.intermediates
+            - okonomimodell.marts
+            - okonomimodell.meta
+            - okonomimodell.oebs
+          write:
+            - okonomimodell.stages
+            - okonomimodell.intermediates
+            - okonomimodell.marts
+            - okonomimodell.meta
+            - okonomimodell.oebs
+        tables:
+          read:
+            - okonomimodell.stages.*
+            - okonomimodell.intermediates.*
+            - okonomimodell.marts.*
+            - okonomimodell.meta.*
+            - okonomimodell.oebs.*
+          write:
+            - okonomimodell.stages.*
+            - okonomimodell.intermediates.*
+            - okonomimodell.marts.*
+            - okonomimodell.meta.*
+            - okonomimodell.oebs.*
+      owns:
+        tables:
+          - okonomimodell.stages.*
+          - okonomimodell.intermediates.*
+          - okonomimodell.marts.*
+          - okonomimodell.meta.*
+          - okonomimodell.oebs.*
+      owner: useradmin
+
+  - okonomimodell_reporter:
+      privileges:
+        databases:
+          read:
+            - okonomimodell
+        schemas:
+          read:
+            - okonomimodell.marts
+            - okonomimodell.meta
+        tables:
+          read:
+            - okonomimodell.marts.*
+            - okonomimodell.meta.*
+      owner: useradmin
+
+warehouses:
+  - okonomimodell_transformer:
+      size: x-small
+      owner: sysadmin
+
+users:
+  - srv_hovedbok:
+      can_login: yes
+      member_of:
+        - okonomimodell_transformer

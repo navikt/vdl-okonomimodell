@@ -1,0 +1,7 @@
+fastapi>=0.104.0
+uvicorn>=0.23.2
+dbt-snowflake<1.9.0,>=1.8.0
+dbt-core<1.9.0,>=1.8.0
+python-dotenv>=1.0.0
+coloredlogs>=15.0.0
+inbound[oracle, snowflake] @ git+https://github.com/navikt/inbound@v0.2

@@ -1,0 +1,71 @@
+name: "vdl_okonomimodell"
+version: "0.0.1"
+config-version: 2
+
+vars:
+  "dbt_date:time_zone": "Oslo"
+  policy_schema: "policies"
+  policy_db: "tilgangsstyring"
+  limit_flag: "{{ env_var('LIMIT_SOURCE', 'n') }}"
+
+flags:
+  send_anonymous_usage_stats: false
+
+profile: "vdl_okonomimodell_profile"
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["data"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+docs-paths: ["docs"]
+clean-targets: ["target", "dbt_packages", "logs"]
+
+models:
+  +persist_docs:
+    relation: true
+    columns: true
+  vdl_okonomimodell:
+    +on_schema_change: fail
+    analysis:
+      archive:
+        +enabled: false
+    stages:
+      +schema: stages
+    marts:
+      +schema: marts
+      +secure: true
+    intermediates:
+      +schema: intermediates
+  elementary:
+    +schema: meta
+  +meta:
+    #Elementary alerts config
+    alert_fields:
+      [
+        "table",
+        "column",
+        "description",
+        "result_message",
+        "test_parameters",
+        "test_query",
+      ]
+    slack_group_alerts_by: table
+
+tests:
+  +meta:
+    #Elementary alerts config
+    alert_fields:
+      [
+        "table",
+        "column",
+        "description",
+        "result_message",
+        "test_parameters",
+        "test_query",
+      ]
+    slack_group_alerts_by: table
+
+snapshots:
+  +transient: false

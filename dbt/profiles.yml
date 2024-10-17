@@ -1,0 +1,43 @@
+vdl_okonomimodell_profile:
+  target: "{{ env_var('DBT_TARGET', 'transformer') }}"
+  outputs:
+    transformer:
+      type: "snowflake"
+      account: "wx23413.europe-west4.gcp"
+      # User/password auth
+      user: "{{ env_var('SRV_USR') }}"
+      password: "{{ env_var('SRV_PWD') }}"
+      role: "okonomimodell_transformer"
+      database: "{{ env_var('OKONOMIMODELL_DB') }}"
+      warehouse: "okonomimodell_transformer"
+      schema: "PUBLIC"
+      threads: 8
+      client_session_keep_alive: False
+    dev_sso:
+      type: snowflake
+      account: "wx23413.europe-west4.gcp"
+      user: "{{ env_var('DBT_USR') }}"
+      role: "okonomimodell_transformer"
+      # SSO config
+      authenticator: externalbrowser
+      database: "{{ env_var('OKONOMIMODELL_DB') }}"
+      warehouse: "okonomimodell_transformer"
+      schema: "PUBLIC"
+      threads: 8
+      client_session_keep_alive: False
+      reuse_connections: True
+
+elementary:
+  outputs:
+    default:
+      type: "snowflake"
+      account: "wx23413.europe-west4.gcp"
+      user: "{{ env_var('SRV_USR') }}"
+      role: "okonomimodell_transformer"
+      authenticator: externalbrowser
+      database: "{{ env_var('okonomimodell_DB') }}"
+      warehouse: "okonomimodell_transformer"
+      schema: "meta"
+      threads: 8
+      client_session_keep_alive: False
+      reuse_connections: True

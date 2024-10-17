@@ -1,0 +1,9 @@
+version: 2
+#ETRM
+sources: 
+  - name: oebs
+    database: okonomimodell
+    schema: oebs
+    tables:
+      - name: xxrtv_gl_segment_v
+      - name: xxrtv_gl_hierarki_v

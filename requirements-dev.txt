@@ -1,0 +1,6 @@
+pytest
+black
+isort
+shandy-sqlfmt[jinjafmt]
+snowbird @ git+https://github.com/navikt/snowbird
+ipdb

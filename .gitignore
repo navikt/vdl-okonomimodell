@@ -1,0 +1,8 @@
+target/*
+!target/index.html
+dbt_modules/
+logs/
+edr_target/
+manifest.json
+partial_parse.msgpack
+.venv
