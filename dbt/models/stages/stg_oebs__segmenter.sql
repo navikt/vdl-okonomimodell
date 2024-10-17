@@ -11,15 +11,21 @@ with
             }} 
         from {{ ref("snapshot__xxrtv_fist_gl_segment_v") }}
     ),
-
-    valid as (
+    
+    ar as (
+        select * from {{ ref("stg__ar") }}
+    ),
+    
+    per_year as (
         select * 
         from source 
-        where raw__dbt_valid_to is null
+        join ar on raw__dbt_valid_from < to_date(cast(ar.ar+1 as varchar),'yyyy')
+        and to_date(cast(ar.ar+1 as varchar),'yyyy') <= coalesce(raw__dbt_valid_to,to_date('9999','yyyy'))
     ),
 
     derived_columnns as (
         select
+            ar,
             cast(raw__flex_value_id as int) as id,
             cast(raw__flex_value_set_name as varchar(200)) as segment_type,
             cast(raw__flex_value as varchar(200)) as kode,
@@ -39,12 +45,18 @@ with
             cast(raw__attribute13 as varchar(200)) as attribute13,
             cast(raw__attribute14 as varchar(200)) as attribute14,
             cast(raw__attribute15 as varchar(200)) as attribute15,
-            *  
-        from valid
+            raw__dbt_valid_to is null as er_siste_gyldige,
+            *  exclude ar
+        from per_year
     ),
     
     keyed as (
         select 
+            {{
+                    dbt_utils.generate_surrogate_key(
+                        ["kode","ar"]
+                    )
+            }} as segment_id_per_ar,
             {{
                     dbt_utils.generate_surrogate_key(
                         ["kode"]

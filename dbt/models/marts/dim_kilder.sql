@@ -8,6 +8,7 @@ with
     source as ( 
         select * 
         from {{ ref("int_segmenter") }}
+        where er_siste_gyldige
     ),
 
     column_selection as (

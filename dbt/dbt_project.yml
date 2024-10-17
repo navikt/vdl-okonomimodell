@@ -7,6 +7,7 @@ vars:
   policy_schema: "policies"
   policy_db: "tilgangsstyring"
   limit_flag: "{{ env_var('LIMIT_SOURCE', 'n') }}"
+  year_zero: "2022"
 
 flags:
   send_anonymous_usage_stats: false

@@ -18,6 +18,7 @@ segment_source as (
 
 recursive_hierarchy (
     id, 
+    ar,
     kode, 
     beskrivelse, 
     forelder_id, 
@@ -29,6 +30,7 @@ recursive_hierarchy (
 ) as (
     select 
         id, 
+        ar,
         kode, 
         beskrivelse, 
         forelder_id, 
@@ -41,6 +43,7 @@ recursive_hierarchy (
     union all 
     select 
         recursive_hierarchy.id, 
+        recursive_hierarchy.ar, 
         recursive_hierarchy.kode, 
         recursive_hierarchy.beskrivelse, 
         hierarchy_source.forelder_id, 
@@ -50,7 +53,9 @@ recursive_hierarchy (
         recursive_hierarchy.hierarki, 
         recursive_hierarchy.segment_type
     from hierarchy_source
-    join recursive_hierarchy on recursive_hierarchy.forelder_id=hierarchy_source.id
+    join recursive_hierarchy 
+        on recursive_hierarchy.forelder_id=hierarchy_source.id 
+        and recursive_hierarchy.ar = hierarchy_source.ar
 ), 
 
 max_level as (
@@ -61,6 +66,7 @@ max_level as (
 
 levels as (
     select
+        ar,
         kode, 
         beskrivelse, 
         array_construct(forelder, forelder_beskrivelse) forelder, 
@@ -109,6 +115,7 @@ rename_columns as (
         kode, 
         beskrivelse,
         segment_type, 
+        ar,
         -- artskonto: grunn niva
         case 
             when coalesce("'4_intern_art'"[0][0],kode)!= kode then kode 
@@ -206,8 +213,10 @@ rename_columns as (
 join_segment_with_hierarchy as (
     select 
         segment_source.segment_id,
+        segment_source.segment_id_per_ar,
         segment_source.segment_type,
         segment_source.kode,
+        segment_source.ar,
         segment_source.beskrivelse,
         segment_source.posterbar_fra_dato,
         segment_source.posterbar_til_dato,
@@ -215,11 +224,13 @@ join_segment_with_hierarchy as (
         segment_source.er_posterbar,
         segment_source.er_budsjetterbar,
         segment_source.er_aktiv,
+        segment_source.er_siste_gyldige,
         case when segment_source.segment_type = 'OR_AKTIVITET' then attribute10 else null end as finansieringskilde,
         case when segment_source.segment_type = 'OR_AKTIVITET' then attribute13 else null end as kategorisering,
         case when segment_source.segment_type = 'OR_AKTIVITET' then attribute14 else null end as produktomrade,
         case when segment_source.segment_type = 'OR_AKTIVITET' then attribute15 else null end as eierkostnadssted,
         rename_columns.* exclude ( 
+            ar,
             kode, 
             beskrivelse,
             segment_type
@@ -228,6 +239,7 @@ join_segment_with_hierarchy as (
     left join rename_columns 
         on segment_source.segment_type = rename_columns.segment_type
         and segment_source.kode = rename_columns.kode
+        and segment_source.ar = rename_columns.ar
 ),
 
 final as (
