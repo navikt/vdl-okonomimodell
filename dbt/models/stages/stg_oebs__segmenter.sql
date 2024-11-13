@@ -19,8 +19,8 @@ with
     per_year as (
         select * 
         from source 
-        join ar on raw__dbt_valid_from < to_date(cast(ar.ar+1 as varchar),'yyyy')
-        and to_date(cast(ar.ar+1 as varchar),'yyyy') <= coalesce(raw__dbt_valid_to,to_date('9999','yyyy'))
+        join ar on raw__dbt_valid_from <= dateadd(day,-1,to_date(cast(ar.ar+1 as varchar),'yyyy'))
+        and dateadd(day,-1,to_date(cast(ar.ar+1 as varchar),'yyyy')) < coalesce(raw__dbt_valid_to,to_date('9999','yyyy'))
     ),
 
     derived_columnns as (
@@ -45,7 +45,6 @@ with
             cast(raw__attribute13 as varchar(200)) as attribute13,
             cast(raw__attribute14 as varchar(200)) as attribute14,
             cast(raw__attribute15 as varchar(200)) as attribute15,
-            raw__dbt_valid_to is null as er_siste_gyldige,
             *  exclude ar
         from per_year
     ),
@@ -62,7 +61,8 @@ with
                         ["kode"]
                     )
             }} as segment_id,
-            * 
+            *,
+            ar = extract(year from current_date) as er_siste_gyldige
         from derived_columnns
     ),
 

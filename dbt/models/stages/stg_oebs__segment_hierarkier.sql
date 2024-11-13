@@ -18,8 +18,8 @@ with
     per_year as (
         select * 
         from source 
-        join ar on raw__dbt_valid_from < to_date(cast(ar.ar+1 as varchar),'yyyy')
-        and to_date(cast(ar.ar+1 as varchar),'yyyy') <= coalesce(raw__dbt_valid_to,to_date('9999','yyyy'))
+        join ar on raw__dbt_valid_from <= dateadd(day,-1,to_date(cast(ar.ar+1 as varchar),'yyyy'))
+        and dateadd(day,-1,to_date(cast(ar.ar+1 as varchar),'yyyy')) < coalesce(raw__dbt_valid_to,to_date('9999','yyyy'))
     ),
 
 
@@ -34,7 +34,7 @@ with
             cast(raw__description_parent as varchar(200)) as forelder_beskrivelse,
             cast(raw__flex_value_id_parent as int) as forelder_id,
             cast(raw__hierarchy_code as varchar(200)) as hierarki,
-            raw__dbt_valid_to is null as er_siste_gyldige,
+
             * exclude ar
         from per_year
     ),
@@ -42,10 +42,16 @@ with
         select 
             {{
                     dbt_utils.generate_surrogate_key(
+                        ["kode"]
+                    )
+            }} as segment_id,
+            {{
+                    dbt_utils.generate_surrogate_key(
                         ["kode","ar"]
                     )
             }} as segment_id_per_ar,
-            * 
+            *,
+            ar = extract(year from current_date) as er_siste_gyldige
         from derived_columnns
     ),
 

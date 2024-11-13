@@ -2,35 +2,29 @@
 
     {{
         config(
-            target_schema="oebs",
-            strategy="timestamp",
-            updated_at="lastet_dato",
-            unique_key="id"
+          target_schema='oebs',
+          strategy='timestamp',
+          unique_key='flex_value_id',
+          updated_at='last_update_date',
         )
     }}
 
-    with
-
-        source as (select {{
-                dbt_utils.star(
-                    from=source("oebs","xxrtv_gl_segment_v"),
-                    quote_identifiers=false,
-                )
-            }}
-        from {{ source("oebs", "xxrtv_gl_segment_v") }}),
-
-        metadata as (
-            select
-                {{
-                    dbt_utils.generate_surrogate_key(
-                        ["flex_value", "flex_value_set_name"]
-                    )
-                }} as id, *,
-                current_date as lastet_dato
-            from source
+    select 
+    {{
+        dbt_utils.star(
+            from=source("oebs","xxrtv_gl_segment_v"),
+            quote_identifiers=false,
+            except=[
+                "_inbound__source_env",
+                "_inbound__run_id",
+                "_inbound__job_name",
+                "_inbound__version",
+                "_inbound__load_time",
+            ]
         )
-
-    select *
-    from metadata
+    }},
+    current_date as lastet_dato,
+    'snapshot' as meta_source
+    from {{ source("oebs", "xxrtv_gl_segment_v") }}
 
 {% endsnapshot %}

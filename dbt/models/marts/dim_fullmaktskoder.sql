@@ -21,13 +21,23 @@ with
             er_summeringsniva,
             er_posterbar,
             er_budsjetterbar,
-            er_aktiv
+            er_aktiv,
+            har_hierarki
         from source
         where segment_type = 'OR_FULLMAKT'
     ),
 
+    depricated as (
+        select *,
+            fullmaktskode_beskrivelse as fullmakter_segment_beskrivelse,
+            fullmaktskode as fullmakter_segment_kode,
+            pk_dim_fullmaktskoder as pk_dim_fullmakter,
+            har_hierarki as _har_hierarki
+        from column_selection 
+    ),
+    
     final as (
         select * 
-        from column_selection
+        from depricated
     )
 select * from final

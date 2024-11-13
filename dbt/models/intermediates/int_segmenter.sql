@@ -59,9 +59,22 @@ recursive_hierarchy (
 ), 
 
 max_level as (
-    select * exclude niva, 
-        max(niva) over (partition by segment_type)-niva as niva
+    select *, 
+        max(niva) over (partition by id)-niva as delta_niva
     from recursive_hierarchy
+), 
+
+default_level as (
+    select distinct
+        ar,
+        kode, 
+        beskrivelse, 
+        array_construct(kode, beskrivelse) forelder, 
+        max(delta_niva) over (partition by id) +1||'_'||lower(hierarki) as hierarki, 
+        segment_type
+    from max_level
+    where lower(hierarki) like 'intern%'
+    and segment_type like 'OR_%'
 ), 
 
 levels as (
@@ -70,12 +83,21 @@ levels as (
         kode, 
         beskrivelse, 
         array_construct(forelder, forelder_beskrivelse) forelder, 
-        niva||'_'||lower(hierarki) as hierarki, 
+        delta_niva||'_'||lower(hierarki) as hierarki, 
         segment_type
     from max_level
     where lower(hierarki) like 'intern%'
     and segment_type like 'OR_%'
     group by all
+    union all 
+    select
+        ar,
+        kode, 
+        beskrivelse, 
+        forelder, 
+        hierarki, 
+        segment_type
+    from default_level
 ), 
 
 pivot_table as (
@@ -84,28 +106,40 @@ pivot_table as (
        pivot ( 
         array_agg(forelder) FOR hierarki IN (
         '0_intern_art',
-        '0_intern_ksted',
-        '0_intern_oppgave',
-        '0_intern_produkt',
-        '0_intern_statskonto',
         '1_intern_art',
-        '1_intern_ksted',
-        '1_intern_oppgave',
-        '1_intern_produkt',
-        '1_intern_statskonto',
         '2_intern_art',
-        '2_intern_ksted',
-        '2_intern_oppgave',
-        '2_intern_produkt',
-        '2_intern_statskonto',
         '3_intern_art',
-        '3_intern_ksted',
-        '3_intern_oppgave',
-        '3_intern_produkt',
-        '3_intern_statskonto',
         '4_intern_art',
+        '5_intern_art',
+        '6_intern_art',
+
+        '0_intern_ksted',
+        '1_intern_ksted',
+        '2_intern_ksted',
+        '3_intern_ksted',
         '4_intern_ksted',
-        '4_intern_produkt'
+        '5_intern_ksted',
+        '6_intern_ksted',
+
+        '0_intern_oppgave',
+        '1_intern_oppgave',
+        '2_intern_oppgave',
+        '3_intern_oppgave', 
+        '4_intern_oppgave', 
+
+        '0_intern_produkt',
+        '1_intern_produkt',
+        '2_intern_produkt',
+        '3_intern_produkt',
+        '4_intern_produkt',
+        '5_intern_produkt',
+
+        '0_intern_statskonto',
+        '1_intern_statskonto',
+        '2_intern_statskonto',
+        '3_intern_statskonto',
+        '4_intern_statskonto'
+        
        ) 
     )
 ), 
@@ -117,88 +151,72 @@ rename_columns as (
         segment_type, 
         ar,
         -- artskonto: grunn niva
-        case 
-            when coalesce("'4_intern_art'"[0][0],kode)!= kode then kode 
-            else null 
+        case when kode = cast("'4_intern_art'"[0][0] as varchar(200)) then 
+            cast("'4_intern_art'"[0][0] as varchar(200))||'_BUDSJETT_NIVA_4'
+        else 
+            cast("'6_intern_art'"[0][0] as varchar(200)) 
         end as artskonto,
-        case 
-            when coalesce("'4_intern_art'"[0][0],kode)!= kode then beskrivelse 
-            else null 
+        case when kode = cast("'4_intern_art'"[0][0] as varchar(200)) then 
+            'Budsjett -'||cast("'4_intern_art'"[0][1] as varchar(2000))
+        else 
+            cast("'6_intern_art'"[0][1] as varchar(2000)) 
         end as artskonto_beskrivelse,
         -- artskonto: foreldre
-        cast("'4_intern_art'"[0][0] as varchar(200)) as konto_tre_siffer,
-        cast("'4_intern_art'"[0][1] as varchar(2000)) as konto_tre_siffer_beskrivelse,
-        cast("'3_intern_art'"[0][0] as varchar(200)) as budsjett_niva,
-        cast("'3_intern_art'"[0][1] as varchar(2000)) as budsjett_niva_beskrivelse,
-        cast("'2_intern_art'"[0][0] as varchar(200)) as kontogruppe,
-        cast("'2_intern_art'"[0][1] as varchar(2000)) as kontogruppe_beskrivelse,
-        cast("'1_intern_art'"[0][0] as varchar(200)) as kontoklasse,
-        cast("'1_intern_art'"[0][1] as varchar(2000)) as kontoklasse_beskrivelse,
-        cast("'0_intern_art'"[0][0] as varchar(200)) as artskonto_total_niva,
-        cast("'0_intern_art'"[0][1] as varchar(2000)) as artskonto_total_niva_beskrivelse,
+        case when kode = cast("'4_intern_art'"[0][0] as varchar(200)) then 
+            cast("'4_intern_art'"[0][0] as varchar(200))||'_BUDSJETT_NIVA_3'
+        else 
+            cast("'5_intern_art'"[0][0] as varchar(200)) 
+        end as konto_tre_siffer,
+        case when kode = cast("'4_intern_art'"[0][0] as varchar(200)) then 
+            'Budsjett -'||cast("'4_intern_art'"[0][1] as varchar(200))
+        else 
+            cast("'5_intern_art'"[0][1] as varchar(2000)) 
+        end as konto_tre_siffer_beskrivelse,
+        cast("'4_intern_art'"[0][0] as varchar(200)) as budsjett_niva,
+        cast("'4_intern_art'"[0][1] as varchar(2000)) as budsjett_niva_beskrivelse,
+        cast("'3_intern_art'"[0][0] as varchar(200)) as kontogruppe,
+        cast("'3_intern_art'"[0][1] as varchar(2000)) as kontogruppe_beskrivelse,
+        cast("'2_intern_art'"[0][0] as varchar(200)) as kontoklasse,
+        cast("'2_intern_art'"[0][1] as varchar(2000)) as kontoklasse_beskrivelse,
+        cast("'1_intern_art'"[0][0] as varchar(200)) as artskonto_total_niva,
+        cast("'1_intern_art'"[0][1] as varchar(2000)) as artskonto_total_niva_beskrivelse,
         -- Kostnadssted: grunn nivå
-        case 
-            when coalesce("'4_intern_ksted'"[0][0],kode)!= kode then kode 
-            else null 
-        end as rapporteringsniva_5,
-        case 
-            when coalesce("'4_intern_ksted'"[0][0],kode)!= kode then beskrivelse 
-            else null 
-        end as rapporteringsniva_5_beskrivelse,
+        cast("'6_intern_ksted'"[0][0] as varchar(200)) as kostnadsstedsniva_5,
+        cast("'6_intern_ksted'"[0][1] as varchar(2000)) as kostnadsstedsniva_5_beskrivelse,
         -- Kostandssted: foreldre
-        cast("'4_intern_ksted'"[0][0] as varchar(200)) as rapporteringsniva_4,
-        cast("'4_intern_ksted'"[0][1] as varchar(2000))as rapporteringsniva_4_beskrivelse,
-        cast("'3_intern_ksted'"[0][0] as varchar(200)) as rapporteringsniva_3,
-        cast("'3_intern_ksted'"[0][1] as varchar(2000)) as rapporteringsniva_3_beskrivelse,
-        cast("'2_intern_ksted'"[0][0] as varchar(200)) as rapporteringsniva_2,
-        cast("'2_intern_ksted'"[0][1] as varchar(2000))as rapporteringsniva_2_beskrivelse,
-        cast("'1_intern_ksted'"[0][0] as varchar(200)) as rapporteringsniva_1,
-        cast("'1_intern_ksted'"[0][1] as varchar(2000)) as rapporteringsniva_1_beskrivelse,
-        cast("'0_intern_ksted'"[0][0] as varchar(200)) as kostandssted_total_niva,
-        cast("'0_intern_ksted'"[0][1] as varchar(2000)) as kostandssted_total_niva_beskrivelse,
+        cast("'5_intern_ksted'"[0][0] as varchar(200)) as kostnadsstedsniva_4,
+        cast("'5_intern_ksted'"[0][1] as varchar(2000))as kostnadsstedsniva_4_beskrivelse,
+        cast("'4_intern_ksted'"[0][0] as varchar(200)) as kostnadsstedsniva_3,
+        cast("'4_intern_ksted'"[0][1] as varchar(2000)) as kostnadsstedsniva_3_beskrivelse,
+        cast("'3_intern_ksted'"[0][0] as varchar(200)) as kostnadsstedsniva_2,
+        cast("'3_intern_ksted'"[0][1] as varchar(2000))as kostnadsstedsniva_2_beskrivelse,
+        cast("'2_intern_ksted'"[0][0] as varchar(200)) as kostnadsstedsniva_1,
+        cast("'2_intern_ksted'"[0][1] as varchar(2000)) as kostnadsstedsniva_1_beskrivelse,
+        cast("'1_intern_ksted'"[0][0] as varchar(200)) as kostnadsstedstotal_niva,
+        cast("'1_intern_ksted'"[0][1] as varchar(2000)) as kostnadsstedstotal_niva_beskrivelse,
         -- Oppgaver
-        case 
-            when coalesce("'3_intern_oppgave'"[0][0],kode)!= kode then kode 
-            else null 
-        end as oppgave,
-        case 
-            when coalesce("'3_intern_oppgave'"[0][0],kode)!= kode then beskrivelse 
-            else null 
-        end as oppgave_beskrivelse,
+        cast("'4_intern_oppgave'"[0][0] as varchar(200)) as oppgave,
+        cast("'4_intern_oppgave'"[0][1] as varchar(2000)) as oppgave_beskrivelse,
         cast("'3_intern_oppgave'"[0][0] as varchar(200)) as oppgaveniva_3,
         cast("'3_intern_oppgave'"[0][1] as varchar(2000)) as oppgaveniva_3_beskrivelse,
         cast("'2_intern_oppgave'"[0][0] as varchar(200)) as oppgaveniva_2,
         cast("'2_intern_oppgave'"[0][1] as varchar(2000)) as oppgaveniva_2_beskrivelse,
         cast("'1_intern_oppgave'"[0][0] as varchar(200)) as oppgaveniva_1,
         cast("'1_intern_oppgave'"[0][1] as varchar(2000)) as oppgaveniva_1_beskrivelse,
-        cast("'0_intern_oppgave'"[0][0] as varchar(200)) as oppgave_total_niva,
-        cast("'0_intern_oppgave'"[0][1] as varchar(2000)) as oppgave_total_niva_beskrivelse,
         -- Produkt
-        case 
-            when coalesce("'3_intern_produkt'"[0][0],kode)!= kode then kode 
-            else null 
-        end as produkt,
-        case 
-            when coalesce("'3_intern_produkt'"[0][0],kode)!= kode then beskrivelse 
-            else null 
-        end as produkt_beskrivelse,
-        cast("'3_intern_produkt'"[0][0] as varchar(200)) as produktgruppe,
-        cast("'3_intern_produkt'"[0][1] as varchar(2000)) as produktgruppe_beskrivelse,
-        cast("'2_intern_produkt'"[0][0] as varchar(200)) as produktkategori,
-        cast("'2_intern_produkt'"[0][1] as varchar(2000)) as produktkategori_beskrivelse,
-        cast("'1_intern_produkt'"[0][0] as varchar(200)) as produkttype,
-        cast("'1_intern_produkt'"[0][1] as varchar(2000)) as produkttype_beskrivelse,
-        cast("'0_intern_produkt'"[0][0] as varchar(200)) as produkt_total_niva,
-        cast("'0_intern_produkt'"[0][1] as varchar(2000)) as produkt_total_niva_beskrivelse,
+        cast("'5_intern_produkt'"[0][0] as varchar(200)) as produkt,
+        cast("'5_intern_produkt'"[0][1] as varchar(2000)) as produkt_beskrivelse,
+        cast("'4_intern_produkt'"[0][0] as varchar(200)) as produktgruppe,
+        cast("'4_intern_produkt'"[0][1] as varchar(2000)) as produktgruppe_beskrivelse,
+        cast("'3_intern_produkt'"[0][0] as varchar(200)) as produktkategori,
+        cast("'3_intern_produkt'"[0][1] as varchar(2000)) as produktkategori_beskrivelse,
+        cast("'2_intern_produkt'"[0][0] as varchar(200)) as produkttype,
+        cast("'2_intern_produkt'"[0][1] as varchar(2000)) as produkttype_beskrivelse,
+        cast("'1_intern_produkt'"[0][0] as varchar(200)) as produkttotal_niva,
+        cast("'1_intern_produkt'"[0][1] as varchar(2000)) as produkttotal_niva_beskrivelse,
         -- Statsregnskapskonti
-        case 
-            when coalesce("'3_intern_statskonto'"[0][0],kode)!= kode then kode 
-            else null 
-        end as statsregnskapskonto,
-        case 
-            when coalesce("'3_intern_statskonto'"[0][0],kode)!= kode then beskrivelse 
-            else null 
-        end as statsregnskapskonto_beskrivelse,
+        cast("'4_intern_statskonto'"[0][0] as varchar(200)) as statsregnskapskonto,
+        cast("'4_intern_statskonto'"[0][1] as varchar(2000)) as statsregnskapskonto_beskrivelse,
         cast("'3_intern_statskonto'"[0][0] as varchar(200)) as under_post,
         cast("'3_intern_statskonto'"[0][1] as varchar(2000)) as under_post_beskrivelse,
         cast("'2_intern_statskonto'"[0][0] as varchar(200)) as kapittel_post,
@@ -229,6 +247,7 @@ join_segment_with_hierarchy as (
         case when segment_source.segment_type = 'OR_AKTIVITET' then attribute13 else null end as kategorisering,
         case when segment_source.segment_type = 'OR_AKTIVITET' then attribute14 else null end as produktomrade,
         case when segment_source.segment_type = 'OR_AKTIVITET' then attribute15 else null end as eierkostnadssted,
+        rename_columns.kode is not null har_hierarki,
         rename_columns.* exclude ( 
             ar,
             kode, 
@@ -243,7 +262,160 @@ join_segment_with_hierarchy as (
 ),
 
 final as (
-    select * from join_segment_with_hierarchy
+    select 
+        segment_id,
+        segment_id_per_ar,
+        segment_type,
+        kode,
+        ar,
+        beskrivelse,
+        posterbar_fra_dato,
+        posterbar_til_dato,
+        er_summeringsniva,
+        er_posterbar,
+        er_budsjetterbar,
+        er_aktiv,
+        er_siste_gyldige,
+        finansieringskilde,
+        kategorisering,
+        produktomrade,
+        eierkostnadssted,
+        har_hierarki,
+        artskonto,
+        artskonto_beskrivelse,
+        konto_tre_siffer,
+        konto_tre_siffer_beskrivelse,
+        budsjett_niva,
+        budsjett_niva_beskrivelse,
+        kontogruppe,
+        kontogruppe_beskrivelse,
+        kontoklasse,
+        kontoklasse_beskrivelse,
+        artskonto_total_niva,
+        artskonto_total_niva_beskrivelse,
+        kostnadsstedsniva_5,
+        kostnadsstedsniva_5_beskrivelse,
+        kostnadsstedsniva_4,
+        kostnadsstedsniva_4_beskrivelse,
+        kostnadsstedsniva_3,
+        kostnadsstedsniva_3_beskrivelse,
+        kostnadsstedsniva_2,
+        kostnadsstedsniva_2_beskrivelse,
+        kostnadsstedsniva_1,
+        kostnadsstedsniva_1_beskrivelse,
+        kostnadsstedstotal_niva,
+        kostnadsstedstotal_niva_beskrivelse,
+        oppgave,
+        oppgave_beskrivelse,
+        oppgaveniva_3,
+        oppgaveniva_3_beskrivelse,
+        oppgaveniva_2,
+        oppgaveniva_2_beskrivelse,
+        oppgaveniva_1,
+        oppgaveniva_1_beskrivelse,
+        produkt,
+        produkt_beskrivelse,
+        produktgruppe,
+        produktgruppe_beskrivelse,
+        produktkategori,
+        produktkategori_beskrivelse,
+        produkttype,
+        produkttype_beskrivelse,
+        produkttotal_niva,
+        produkttotal_niva_beskrivelse,
+        statsregnskapskonto,
+        statsregnskapskonto_beskrivelse,
+        under_post,
+        under_post_beskrivelse,
+        kapittel_post,
+        kapittel_post_beskrivelse,
+        kapittel,
+        kapittel_beskrivelse,
+        statsregnskapskonto_total_niva,
+        statsregnskapskonto_total_niva_beskrivelse
+    from join_segment_with_hierarchy
+    union all 
+    select 
+        {{
+            dbt_utils.generate_surrogate_key(
+                ["null"]
+            )
+        }} as segment_id,
+        {{
+            dbt_utils.generate_surrogate_key(
+                ["null","ar"]
+            )
+        }} as segment_id_per_ar,
+        segment_type,
+        null as kode,
+        ar,
+        null as beskrivelse,
+        null as posterbar_fra_dato,
+        null as posterbar_til_dato,
+        false as er_summeringsniva,
+        false as er_posterbar,
+        false as er_budsjetterbar,
+        false as er_aktiv,
+        er_siste_gyldige,
+        null as finansieringskilde,
+        null as kategorisering,
+        null as produktomrade,
+        null as eierkostnadssted,
+        har_hierarki,
+        null as artskonto,
+        null as artskonto_beskrivelse,
+        null as konto_tre_siffer,
+        null as konto_tre_siffer_beskrivelse,
+        null as budsjett_niva,
+        null as budsjett_niva_beskrivelse,
+        null as kontogruppe,
+        null as kontogruppe_beskrivelse,
+        null as kontoklasse,
+        null as kontoklasse_beskrivelse,
+        null as artskonto_total_niva,
+        null as artskonto_total_niva_beskrivelse,
+        null as kostnadsstedsniva_5,
+        null as kostnadsstedsniva_5_beskrivelse,
+        null as kostnadsstedsniva_4,
+        null as kostnadsstedsniva_4_beskrivelse,
+        null as kostnadsstedsniva_3,
+        null as kostnadsstedsniva_3_beskrivelse,
+        null as kostnadsstedsniva_2,
+        null as kostnadsstedsniva_2_beskrivelse,
+        null as kostnadsstedsniva_1,
+        null as kostnadsstedsniva_1_beskrivelse,
+        null as kostnadsstedstotal_niva,
+        null as kostnadsstedstotal_niva_beskrivelse,
+        null as oppgave,
+        null as oppgave_beskrivelse,
+        null as oppgaveniva_3,
+        null as oppgaveniva_3_beskrivelse,
+        null as oppgaveniva_2,
+        null as oppgaveniva_2_beskrivelse,
+        null as oppgaveniva_1,
+        null as oppgaveniva_1_beskrivelse,
+        null as produkt,
+        null as produkt_beskrivelse,
+        null as produktgruppe,
+        null as produktgruppe_beskrivelse,
+        null as produktkategori,
+        null as produktkategori_beskrivelse,
+        null as produkttype,
+        null as produkttype_beskrivelse,
+        null as produkttotal_niva,
+        null as produkttotal_niva_beskrivelse,
+        null as statsregnskapskonto,
+        null as statsregnskapskonto_beskrivelse,
+        null as under_post,
+        null as under_post_beskrivelse,
+        null as kapittel_post,
+        null as kapittel_post_beskrivelse,
+        null as kapittel,
+        null as kapittel_beskrivelse,
+        null as statsregnskapskonto_total_niva,
+        null as statsregnskapskonto_total_niva_beskrivelse
+    from join_segment_with_hierarchy
+    group by all 
 )
 
 select * from final

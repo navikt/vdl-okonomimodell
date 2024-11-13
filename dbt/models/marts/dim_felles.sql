@@ -21,13 +21,22 @@ with
             er_summeringsniva,
             er_posterbar,
             er_budsjetterbar,
-            er_aktiv
+            er_aktiv,
+            har_hierarki
         from source
         where segment_type = 'OR_FRITT_FELT_1'
     ),
 
+    depricated as (
+        select *,
+            felles_beskrivelse as felles_segment_beskrivelse,
+            felles as felles_segment_kode,
+            har_hierarki as _har_hierarki
+        from column_selection 
+    ),
+    
     final as (
         select * 
-        from column_selection
+        from depricated
     )
 select * from final
