@@ -56,6 +56,7 @@ recursive_hierarchy (
     join recursive_hierarchy 
         on recursive_hierarchy.forelder_id=hierarchy_source.id 
         and recursive_hierarchy.ar = hierarchy_source.ar
+        and coalesce(recursive_hierarchy.hierarki,'default') = coalesce(hierarchy_source.hierarki,'default')
 ), 
 
 max_level as (
