@@ -40,6 +40,7 @@ with
     ),
     depricated as (
         select 
+            *,  
             eierkostnadssted as ansvarlig_kostnadssted,
             produktomrade as hovedansvarlig,
             beskrivelse as oppgaver_segment_beskrivelse,

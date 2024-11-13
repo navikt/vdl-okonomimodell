@@ -25,12 +25,10 @@ with
             har_hierarki,
             statsregnskapskonto,
             statsregnskapskonto_beskrivelse,
-            under_post,
-            under_post_beskrivelse,
-            kapittel_post,
-            kapittel_post_beskrivelse,
+            post,
+            post_beskrivelse,
             kapittel,
-            kapittel_beskrivelse
+            kapittel_beskrivelse,
             statsregnskapskonto_total_niva, 
             statsregnskapskonto_total_niva_beskrivelse
         from source
@@ -39,18 +37,18 @@ with
     depricated as (
         select 
             *,
-            beskrivelse as statsregnskapskonti_segment_beskrivelse,
-            statsregnskapskonto_total_niva as statsregnskapskonti_segment_beskrivelse_niva_0,
-            kapittel_post as statsregnskapskonti_segment_beskrivelse_niva_1,
-            kapittel as statsregnskapskonti_segment_beskrivelse_niva_2,
-            under_post as statsregnskapskonti_segment_beskrivelse_niva_3,
             kode as statsregnskapskonti_segment_kode,
+            beskrivelse as statsregnskapskonti_segment_beskrivelse,
+            statsregnskapskonto as statsregnskapskonti_segment_kode_niva_3,
+            statsregnskapskonto_beskrivelse as statsregnskapskonti_segment_beskrivelse_niva_3,
+            post as statsregnskapskonti_segment_kode_niva_2,
+            post_beskrivelse as statsregnskapskonti_segment_beskrivelse_niva_2,
+            kapittel as statsregnskapskonti_segment_kode_niva_1,
+            kapittel_beskrivelse as statsregnskapskonti_segment_beskrivelse_niva_1,
             statsregnskapskonto_total_niva as statsregnskapskonti_segment_kode_niva_0,
-            kapittel_post as statsregnskapskonti_segment_kode_niva_1,
-            kapittel as statsregnskapskonti_segment_kode_niva_2,
-            under_post as statsregnskapskonti_segment_kode_niva_3,
+            statsregnskapskonto_total_niva_beskrivelse as statsregnskapskonti_segment_beskrivelse_niva_0,
             right(
-                kapittel, 2
+                post, 2
             ) as statsregnskapskonti_segment_kode_post,
             har_hierarki as _har_hierarki
         from column_selection
