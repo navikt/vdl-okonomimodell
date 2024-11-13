@@ -5,8 +5,8 @@ vdl_okonomimodell_profile:
       type: "snowflake"
       account: "wx23413.europe-west4.gcp"
       # User/password auth
-      user: "{{ env_var('SRV_USR') }}"
-      password: "{{ env_var('SRV_PWD') }}"
+      user: "{{ env_var('DBT_USR') }}"
+      password: "{{ env_var('DBT_PWD') }}"
       role: "okonomimodell_transformer"
       database: "{{ env_var('OKONOMIMODELL_DB') }}"
       warehouse: "okonomimodell_transformer"
