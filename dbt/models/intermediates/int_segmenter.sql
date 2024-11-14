@@ -22,35 +22,35 @@ rename_columns as (
         segment_type, 
         ar,
         -- artskonto: grunn niva
-        case when kode = cast("'4_intern_art'"[0][0] as varchar(200)) then 
-            cast("'4_intern_art'"[0][0] as varchar(200))||'_BUDSJETT_NIVA_4'
-        else 
-            cast("'6_intern_art'"[0][0] as varchar(200)) 
-        end as artskonto,
-        case when kode = cast("'4_intern_art'"[0][0] as varchar(200)) then 
-            'Budsjett -'||cast("'4_intern_art'"[0][1] as varchar(2000))
-        else 
-            cast("'6_intern_art'"[0][1] as varchar(2000)) 
-        end as artskonto_beskrivelse,
-        -- artskonto: foreldre
-        case when kode = cast("'4_intern_art'"[0][0] as varchar(200)) then 
-            cast("'4_intern_art'"[0][0] as varchar(200))||'_BUDSJETT_NIVA_3'
+        case when kode = cast("'3_intern_art'"[0][0] as varchar(200)) then 
+            cast("'3_intern_art'"[0][0] as varchar(200))||'_BUDSJETT_NIVA_4'
         else 
             cast("'5_intern_art'"[0][0] as varchar(200)) 
-        end as konto_tre_siffer,
-        case when kode = cast("'4_intern_art'"[0][0] as varchar(200)) then 
-            'Budsjett -'||cast("'4_intern_art'"[0][1] as varchar(200))
+        end as artskonto,
+        case when kode = cast("'3_intern_art'"[0][0] as varchar(200)) then 
+            'Budsjett -'||cast("'3_intern_art'"[0][1] as varchar(2000))
         else 
             cast("'5_intern_art'"[0][1] as varchar(2000)) 
+        end as artskonto_beskrivelse,
+        -- artskonto: foreldre
+        case when kode = cast("'3_intern_art'"[0][0] as varchar(200)) then 
+            cast("'3_intern_art'"[0][0] as varchar(200))||'_BUDSJETT_NIVA_3'
+        else 
+            cast("'4_intern_art'"[0][0] as varchar(200)) 
+        end as konto_tre_siffer,
+        case when kode = cast("'3_intern_art'"[0][0] as varchar(200)) then 
+            'Budsjett -'||cast("'3_intern_art'"[0][1] as varchar(200))
+        else 
+            cast("'4_intern_art'"[0][1] as varchar(2000)) 
         end as konto_tre_siffer_beskrivelse,
-        cast("'4_intern_art'"[0][0] as varchar(200)) as budsjett_niva,
-        cast("'4_intern_art'"[0][1] as varchar(2000)) as budsjett_niva_beskrivelse,
-        cast("'3_intern_art'"[0][0] as varchar(200)) as kontogruppe,
-        cast("'3_intern_art'"[0][1] as varchar(2000)) as kontogruppe_beskrivelse,
-        cast("'2_intern_art'"[0][0] as varchar(200)) as kontoklasse,
-        cast("'2_intern_art'"[0][1] as varchar(2000)) as kontoklasse_beskrivelse,
-        cast("'1_intern_art'"[0][0] as varchar(200)) as artskonto_total_niva,
-        cast("'1_intern_art'"[0][1] as varchar(2000)) as artskonto_total_niva_beskrivelse,
+        cast("'3_intern_art'"[0][0] as varchar(200)) as budsjett_niva,
+        cast("'3_intern_art'"[0][1] as varchar(2000)) as budsjett_niva_beskrivelse,
+        cast("'2_intern_art'"[0][0] as varchar(200)) as kontogruppe,
+        cast("'2_intern_art'"[0][1] as varchar(2000)) as kontogruppe_beskrivelse,
+        cast("'1_intern_art'"[0][0] as varchar(200)) as kontoklasse,
+        cast("'1_intern_art'"[0][1] as varchar(2000)) as kontoklasse_beskrivelse,
+        cast("'0_intern_art'"[0][0] as varchar(200)) as artskonto_total_niva,
+        cast("'0_intern_art'"[0][1] as varchar(2000)) as artskonto_total_niva_beskrivelse,
         -- Kostnadssted: grunn nivå
         cast("'5_intern_ksted'"[0][0] as varchar(200)) as kostnadsstedsniva_5,
         cast("'5_intern_ksted'"[0][1] as varchar(2000)) as kostnadsstedsniva_5_beskrivelse,
@@ -66,14 +66,14 @@ rename_columns as (
         cast("'0_intern_ksted'"[0][0] as varchar(200)) as kostnadsstedstotal_niva,
         cast("'0_intern_ksted'"[0][1] as varchar(2000)) as kostnadsstedstotal_niva_beskrivelse,
         -- Oppgaver
-        cast("'4_intern_oppgave'"[0][0] as varchar(200)) as oppgave,
-        cast("'4_intern_oppgave'"[0][1] as varchar(2000)) as oppgave_beskrivelse,
-        cast("'3_intern_oppgave'"[0][0] as varchar(200)) as oppgaveniva_1,
-        cast("'3_intern_oppgave'"[0][1] as varchar(2000)) as oppgaveniva_1_beskrivelse,
-        cast("'2_intern_oppgave'"[0][0] as varchar(200)) as oppgaveniva_2,
-        cast("'2_intern_oppgave'"[0][1] as varchar(2000)) as oppgaveniva_2_beskrivelse,
-        cast("'1_intern_oppgave'"[0][0] as varchar(200)) as oppgaveniva_3,
-        cast("'1_intern_oppgave'"[0][1] as varchar(2000)) as oppgaveniva_3_beskrivelse,
+        cast("'3_intern_oppgave'"[0][0] as varchar(200)) as oppgave,
+        cast("'3_intern_oppgave'"[0][1] as varchar(2000)) as oppgave_beskrivelse,
+        cast("'2_intern_oppgave'"[0][0] as varchar(200)) as oppgaveniva_3,
+        cast("'2_intern_oppgave'"[0][1] as varchar(2000)) as oppgaveniva_3_beskrivelse,
+        cast("'1_intern_oppgave'"[0][0] as varchar(200)) as oppgaveniva_2,
+        cast("'1_intern_oppgave'"[0][1] as varchar(2000)) as oppgaveniva_2_beskrivelse,
+        cast("'0_intern_oppgave'"[0][0] as varchar(200)) as oppgaveniva_1,
+        cast("'0_intern_oppgave'"[0][1] as varchar(2000)) as oppgaveniva_1_beskrivelse,
         -- Produkt
         cast("'4_intern_produkt'"[0][0] as varchar(200)) as produkt,
         cast("'4_intern_produkt'"[0][1] as varchar(2000)) as produkt_beskrivelse,
@@ -236,7 +236,7 @@ final as (
         null as kategorisering,
         null as produktomrade,
         null as eierkostnadssted,
-        har_hierarki,
+        null as har_hierarki,
         null as artskonto,
         null as artskonto_beskrivelse,
         null as konto_tre_siffer,

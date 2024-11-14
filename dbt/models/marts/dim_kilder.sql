@@ -7,36 +7,27 @@
 with 
     source as ( 
         select * 
-        from {{ ref("int_segmenter") }}
+        from {{ ref("dim_kilder_per_ar") }}
         where er_siste_gyldige
     ),
 
     column_selection as (
-        select 
+        select  
             segment_id as pk_dim_kilder,
-            kode as kilde,
-            beskrivelse as kilde_beskrivelse,
-            posterbar_fra_dato,
-            posterbar_til_dato,
-            er_summeringsniva,
-            er_posterbar,
-            er_budsjetterbar,
-            er_aktiv,
-            har_hierarki
+            {{
+                dbt_utils.star(
+                    from=ref("dim_kilder_per_ar"),
+                    quote_identifiers=false,
+                    except=[
+                        "pk_dim_kilder_per_ar",
+                        "segment_id",
+                        ]
+                )
+            }}  
         from source
-        where segment_type = 'OR_KILDE'
     ),
-
-    depricated as (
-        select *,
-            kilde_beskrivelse as kilder_segment_beskrivelse,
-            kilde as kilder_segment_kode,
-            har_hierarki as _har_hierarki
-        from column_selection 
-    ),
-    
     final as (
         select * 
-        from depricated
+        from column_selection
     )
 select * from final
