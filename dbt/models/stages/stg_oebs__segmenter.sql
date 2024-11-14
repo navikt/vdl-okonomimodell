@@ -37,8 +37,9 @@ with
             cast(raw__end_date_active as date) as posterbar_til_dato,
             raw__summary_flag = 'Y' as er_summeringsniva,
             raw__posterbar = 'Y' as er_posterbar,
-            raw__attribute19 = 'Y' as er_budsjetterbar,
             raw__enabled_flag = 'Y' as er_aktiv,
+            coalesce(raw__attribute19,'N') = 'Y' as er_budsjetterbar,
+            ar = extract(year from current_date) as er_siste_gyldige,
             cast(raw__attribute10 as varchar(200)) as attribute10,
             cast(raw__attribute11 as varchar(200)) as attribute11,
             cast(raw__attribute12 as varchar(200)) as attribute12,
@@ -61,8 +62,7 @@ with
                         ["kode"]
                     )
             }} as segment_id,
-            *,
-            ar = extract(year from current_date) as er_siste_gyldige
+            *
         from derived_columnns
     ),
 
