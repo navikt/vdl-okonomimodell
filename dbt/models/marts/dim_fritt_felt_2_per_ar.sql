@@ -26,7 +26,7 @@ with
             er_siste_gyldige,
             har_hierarki
         from source
-        where segment_type = 'OR_ANSVARSSTED'
+        where segment_type = 'OR_FRITT_FELT_2'
     ),
     
     final as (
