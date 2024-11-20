@@ -13,7 +13,7 @@ with
 
     column_selection as (
         select  
-            segment_id as pk_dim_resurskoder,
+            segment_id as pk_dim_ressurskoder,
             {{
                 dbt_utils.star(
                     from=ref("dim_ressurskoder_per_ar"),
