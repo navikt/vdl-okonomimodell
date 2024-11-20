@@ -12,10 +12,10 @@ with
 
     column_selection as (
         select 
-            segment_id_per_ar as pk_dim_ressurskoder_per_ar,
+            segment_id_per_ar as pk_dim_regnskapsforere_per_ar,
             segment_id,
-            kode as ressurskode,
-            beskrivelse as ressurskode_beskrivelse,
+            kode as regnskapsforer,
+            beskrivelse as regnskapsforer_beskrivelse,
             ar,
             posterbar_fra_dato,
             posterbar_til_dato,
