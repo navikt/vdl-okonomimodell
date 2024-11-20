@@ -14,8 +14,8 @@ with
         select 
             segment_id_per_ar as pk_dim_fritt_felt_2_per_ar,
             segment_id,
-            kode as fritt_felt_2,
-            beskrivelse as fritt_felt_2_beskrivelse,
+            kode as fritt_felt_1,
+            beskrivelse as fritt_felt_1_beskrivelse,
             ar,
             posterbar_fra_dato,
             posterbar_til_dato,
@@ -26,7 +26,7 @@ with
             er_siste_gyldige,
             har_hierarki
         from source
-        where segment_type = 'OR_ANSVARSSTED'
+        where segment_type = 'OR_FRITT_FELT_1'
     ),
     
     final as (
