@@ -31,33 +31,14 @@ with
             post_beskrivelse,
             kapittel,
             kapittel_beskrivelse,
-            statsregnskapskonto_total_niva, 
-            statsregnskapskonto_total_niva_beskrivelse
+            statsregnskapskonto_totalniva, 
+            statsregnskapskonto_totalniva_beskrivelse
         from source
         where segment_type = 'OR_STATSKONTO'
-    ),
-    depricated as (
-        select 
-            *,
-            kode as statsregnskapskonti_segment_kode,
-            beskrivelse as statsregnskapskonti_segment_beskrivelse,
-            statsregnskapskonto as statsregnskapskonti_segment_kode_niva_3,
-            statsregnskapskonto_beskrivelse as statsregnskapskonti_segment_beskrivelse_niva_3,
-            post as statsregnskapskonti_segment_kode_niva_2,
-            post_beskrivelse as statsregnskapskonti_segment_beskrivelse_niva_2,
-            kapittel as statsregnskapskonti_segment_kode_niva_1,
-            kapittel_beskrivelse as statsregnskapskonti_segment_beskrivelse_niva_1,
-            statsregnskapskonto_total_niva as statsregnskapskonti_segment_kode_niva_0,
-            statsregnskapskonto_total_niva_beskrivelse as statsregnskapskonti_segment_beskrivelse_niva_0,
-            right(
-                post, 2
-            ) as statsregnskapskonti_segment_kode_post,
-            har_hierarki as _har_hierarki
-        from column_selection
     ),
 
     final as (
         select * 
-        from depricated
+        from column_selection
     )
 select * from final

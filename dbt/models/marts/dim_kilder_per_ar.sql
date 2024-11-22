@@ -28,17 +28,9 @@ with
         from source
         where segment_type = 'OR_KILDE'
     ),
-
-    depricated as (
-        select *,
-            kilde_beskrivelse as kilder_segment_beskrivelse,
-            kilde as kilder_segment_kode,
-            har_hierarki as _har_hierarki
-        from column_selection 
-    ),
     
     final as (
         select * 
-        from depricated
+        from column_selection
     )
 select * from final

@@ -28,15 +28,9 @@ with
         from source
         where segment_type = 'OR_TILSAGNSAR'
     ),
-    depricated as (
-        select *,
-            tilsagnsar_beskrivelse as tilsagnsar_segment_beskrivelse,
-            tilsagnsar as tilsagnsar_segment_kode,
-            har_hierarki as _har_hierarki
-        from column_selection
-    ),
+    
     final as (
         select * 
-        from depricated
+        from column_selection
     )
 select * from final

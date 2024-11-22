@@ -40,27 +40,9 @@ with
         from source
         where segment_type = 'OR_AKTIVITET'
     ),
-    depricated as (
-        select 
-            *,  
-            eierkostnadssted as ansvarlig_kostnadssted,
-            produktomrade as hovedansvarlig,
-            beskrivelse as oppgaver_segment_beskrivelse,
-            oppgaveniva_1_beskrivelse as oppgaver_segment_beskrivelse_niva_0,
-            oppgaveniva_2_beskrivelse as oppgaver_segment_beskrivelse_niva_1,
-            oppgaveniva_3_beskrivelse as oppgaver_segment_beskrivelse_niva_2,
-            oppgave_beskrivelse as oppgaver_segment_beskrivelse_niva_3,
-            kode as oppgaver_segment_kode,
-            oppgaveniva_1 as oppgaver_segment_kode_niva_0,
-            oppgaveniva_2 as oppgaver_segment_kode_niva_1,
-            oppgaveniva_3 as oppgaver_segment_kode_niva_2,
-            oppgave as oppgaver_segment_kode_niva_3,
-            har_hierarki as _har_hierarki,
-        from column_selection
-    ),
 
     final as (
         select * 
-        from depricated
+        from column_selection
     )
 select * from final

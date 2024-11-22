@@ -33,31 +33,14 @@ with
             produktkategori_beskrivelse,
             produkttype,
             produkttype_beskrivelse,
-            produkttotal_niva,
-            produkttotal_niva_beskrivelse
+            produkt_totalniva,
+            produkt_totalniva_beskrivelse
         from source
         where segment_type = 'OR_FORMAL'
     ),
-    depricated as (
-        select *,
-            beskrivelse as produkter_segment_beskrivelse,
-            produkt_beskrivelse as produkter_segment_beskrivelse_niva_4,
-            produktgruppe_beskrivelse as produkter_segment_beskrivelse_niva_3,
-            produktkategori_beskrivelse as produkter_segment_beskrivelse_niva_2,
-            produkttype_beskrivelse as produkter_segment_beskrivelse_niva_1,
-            produkttotal_niva_beskrivelse as produkter_segment_beskrivelse_niva_0,
-            kode as produkter_segment_kode,
-            produkt as produkter_segment_kode_niva_4,
-            produktgruppe as produkter_segment_kode_niva_3,
-            produktkategori as produkter_segment_kode_niva_2,
-            produkttype as produkter_segment_kode_niva_1,
-            produkttotal_niva as produkter_segment_kode_niva_0,
-            har_hierarki as _har_hierarki
-        from column_selection
-    ), 
 
     final as (
         select * 
-        from depricated
+        from column_selection
     )
 select * from final

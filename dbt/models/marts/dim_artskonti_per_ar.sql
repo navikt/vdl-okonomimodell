@@ -35,33 +35,14 @@ with
             kontogruppe_beskrivelse,
             kontoklasse,
             kontoklasse_beskrivelse,
-            artskonto_total_niva,
-            artskonto_total_niva_beskrivelse
+            artskonto_totalniva,
+            artskonto_totalniva_beskrivelse
         from source
         where segment_type = 'OR_ART'
     ),
-    depricated as (
-        select *,
-            kode as artskonti_segment_kode,
-            artskonto as artskonti_segment_kode_niva_4,
-            konto_tre_siffer as artskonti_segment_kode_niva_3,
-            budsjett_niva as artskonti_segment_kode_niva_2_5,
-            kontogruppe as artskonti_segment_kode_niva_2,
-            kontoklasse as artskonti_segment_kode_niva_1,
-            artskonto_total_niva as artskonti_segment_kode_niva_0,
-            beskrivelse as artskonti_segment_beskrivelse,
-            artskonto_beskrivelse as artskonti_segment_beskrivelse_niva_4,
-            konto_tre_siffer_beskrivelse as artskonti_segment_beskrivelse_niva_3,
-            budsjett_niva_beskrivelse as artskonti_segment_beskrivelse_niva_2_5,
-            kontogruppe_beskrivelse as artskonti_segment_beskrivelse_niva_2,
-            kontoklasse_beskrivelse as artskonti_segment_beskrivelse_niva_1,
-            artskonto_total_niva_beskrivelse as artskonti_segment_beskrivelse_niva_0,
-            0 as er_ytelse_konto,
-            har_hierarki as _har_hierarki
-        from column_selection 
-    ),
+    
     final as (
         select * 
-        from depricated
+        from column_selection
     )
 select * from final
