@@ -12,7 +12,7 @@ with
 
     column_selection as (
         select 
-            segment_id_per_ar as pk_dim_formaler_per_ar,
+            segment_id_per_ar as pk_dim_formalskoder_per_ar,
             segment_id,
             kode as formal, 
             beskrivelse as formal_beskrivelse,
