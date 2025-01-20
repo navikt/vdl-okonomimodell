@@ -1,0 +1,11 @@
+version: 1
+
+sources:
+  - name: csv
+    database: okonomimodell
+    meta:
+      contains_pii: true
+      access_level: internal
+    schema: csv
+    tables:
+      - name: anskaffelse_kategorier

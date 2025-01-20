@@ -6,3 +6,4 @@ edr_target/
 manifest.json
 partial_parse.msgpack
 .venv
+seeds/

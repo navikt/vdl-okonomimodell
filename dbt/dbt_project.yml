@@ -17,7 +17,7 @@ profile: "vdl_okonomimodell_profile"
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["data"]
+seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 docs-paths: ["docs"]
@@ -70,3 +70,9 @@ tests:
 
 snapshots:
   +transient: false
+
+seeds:
+  +enabled: true
+  +database: okonomimodell
+  +schema: csv
+  +delimiter: ";"
