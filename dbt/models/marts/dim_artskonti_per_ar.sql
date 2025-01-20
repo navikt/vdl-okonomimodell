@@ -10,6 +10,11 @@ with
         from {{ ref("int_segmenter") }}
     ),
 
+    anskaffelseskategori as ( 
+        select * 
+        from {{ ref("stg_csv__artskonto_kategori") }}
+    ),
+
     column_selection as (
         select 
             segment_id_per_ar as pk_dim_artskonti_per_ar,
@@ -40,9 +45,15 @@ with
         from source
         where segment_type = 'OR_ART'
     ),
+
+    include_anskaffelseskategori as (
+        select * from column_selection 
+        left join anskaffelseskategori
+        on column_selection.kode = anskaffelseskategori.artskonto
+    ),
     
     final as (
         select * 
-        from column_selection
+        from include_anskaffelseskategori
     )
 select * from final
