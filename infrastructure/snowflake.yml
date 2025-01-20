@@ -11,6 +11,7 @@ databases:
         - marts
         - oebs
         - meta
+        - csv
 
 # Roles
 roles:
@@ -24,12 +25,14 @@ roles:
         schemas:
           read:
             - okonomimodell.stages
+            - okonomimodell.csv
             - okonomimodell.intermediates
             - okonomimodell.marts
             - okonomimodell.meta
             - okonomimodell.oebs
           write:
             - okonomimodell.stages
+            - okonomimodell.csv
             - okonomimodell.intermediates
             - okonomimodell.marts
             - okonomimodell.meta
@@ -37,12 +40,14 @@ roles:
         tables:
           read:
             - okonomimodell.stages.*
+            - okonomimodell.csv.*
             - okonomimodell.intermediates.*
             - okonomimodell.marts.*
             - okonomimodell.meta.*
             - okonomimodell.oebs.*
           write:
             - okonomimodell.stages.*
+            - okonomimodell.csv.*
             - okonomimodell.intermediates.*
             - okonomimodell.marts.*
             - okonomimodell.meta.*
@@ -50,6 +55,7 @@ roles:
       owns:
         tables:
           - okonomimodell.stages.*
+          - okonomimodell.csv.*
           - okonomimodell.intermediates.*
           - okonomimodell.marts.*
           - okonomimodell.meta.*
