@@ -42,7 +42,8 @@ with
     ),
     
     final as (
-        select * 
+        select * exclude (pk_dim_kostnadssteder_per_ar), -- TEST: er kun midlertidg
+            segment_id || '-' || ar as pk_dim_kostnadssteder_per_ar -- TEST: er kun midlertidg
         from column_selection
     )
 select * from final
