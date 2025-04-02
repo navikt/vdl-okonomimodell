@@ -1,0 +1,47 @@
+models:
+  - name: int_segmenter
+    data_tests:
+      - have_hierarchy:
+          name: "kostnadssteder_codes_have_hierarchy"
+          segment_type: "OR_KSTED"
+          config:
+            severity: "warn"
+      - have_hierarchy:
+          name: "artskonti_codes_have_hierarchy"
+          segment_type: "OR_ART"
+          config:
+            severity: "warn"
+      - have_hierarchy:
+          name: "produkter_codes_have_hierarchy"
+          segment_type: "OR_FORMAL"
+          config:
+            severity: "warn"
+      - have_hierarchy:
+          name: "statsregnskapskonti_codes_have_hierarchy"
+          segment_type: "OR_STATSKONTO"
+          config:
+            severity: "warn"
+      - have_hierarchy:
+          name: "last_active_kostnadssteder_have_hierarchy"
+          segment_type: "OR_KSTED"
+          config:
+            severity: "warn"
+          where: "er_siste_gyldige"
+      - have_hierarchy:
+          name: "last_active_artskonti_codes_have_hierarchy"
+          segment_type: "OR_ART"
+          config:
+            severity: "warn"
+          where: "er_siste_gyldige"
+      - have_hierarchy:
+          name: "last_active_produkter_codes_have_hierarchy"
+          segment_type: "OR_FORMAL"
+          config:
+            severity: "warn"
+          where: "er_siste_gyldige"
+      - have_hierarchy:
+          name: "last_active_statsregnskapskonti_codes_have_hierarchy"
+          segment_type: "OR_STATSKONTO"
+          config:
+            severity: "warn"
+          where: "er_siste_gyldige"
