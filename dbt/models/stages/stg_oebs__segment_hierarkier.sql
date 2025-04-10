@@ -3,12 +3,12 @@ with
         select 
             {{
                 dbt_utils.star(
-                    from=ref("snapshot__xxrtv_gl_hierarki_v"),
+                    from=ref("snapshot__xxrtv_gl_hierarki_v__v3"),
                     quote_identifiers=false,
                     prefix="raw__",
                 )
             }}
-        from {{ ref("snapshot__xxrtv_gl_hierarki_v") }}
+        from {{ ref("snapshot__xxrtv_gl_hierarki_v__v3") }}
     ),
 
     ar as (
