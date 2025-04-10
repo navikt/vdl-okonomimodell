@@ -13,6 +13,30 @@ vdl_okonomimodell_profile:
       schema: "PUBLIC"
       threads: 8
       client_session_keep_alive: False
+    prod:
+      type: "snowflake"
+      account: "wx23413.europe-west4.gcp"
+      user: "{{ env_var('DBT_USR') }}"
+      role: "okonomimodell_transformer"
+      authenticator: externalbrowser
+      database: "okonomimodell"
+      warehouse: "okonomimodell_transformer"
+      schema: "PUBLIC"
+      threads: 8
+      client_session_keep_alive: False
+    dev:
+      type: snowflake
+      account: "wx23413.europe-west4.gcp"
+      user: "{{ env_var('DBT_USR') }}"
+      role: "okonomimodell_transformer"
+      # SSO config
+      authenticator: externalbrowser
+      database: "dev_{{ env_var('USER') }}_okonomimodell"
+      warehouse: "okonomimodell_transformer"
+      schema: "PUBLIC"
+      threads: 8
+      client_session_keep_alive: False
+      reuse_connections: True
     dev_sso:
       type: snowflake
       account: "wx23413.europe-west4.gcp"
