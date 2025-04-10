@@ -8,6 +8,12 @@ vars:
   policy_db: "tilgangsstyring"
   limit_flag: "{{ env_var('LIMIT_SOURCE', 'n') }}"
   year_zero: "2022"
+  forste_regnskapsdato: "2023-01-01"
+  #Elementary
+  disable_dbt_artifacts_autoupload: "{{ target.name != 'transformer' }}"
+  disable_dbt_invocation_autoupload: "{{ target.name != 'transformer' }}"
+  disable_run_results: "{{ target.name != 'transformer' }}"
+  disable_tests_results: "{{ target.name != 'transformer' }}"
 
 flags:
   send_anonymous_usage_stats: false

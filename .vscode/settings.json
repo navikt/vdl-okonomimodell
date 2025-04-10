@@ -1,3 +1,36 @@
 {
-    "dbt.perspectiveTheme": "Vintage"
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+    },
+    "isort.args": [
+        "--profile",
+        "black"
+    ],
+    "yaml.schemas": {
+        "https://raw.githubusercontent.com/dbt-labs/dbt-jsonschema/main/schemas/dbt_project.json": "dbt/dbt_project.yml"
+    },
+    "python.testing.pytestArgs": [
+        "--ignore=dbt",
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "dbt.queryLimit": 500,
+    "files.associations": {
+        "*.sql": "jinja-sql"
+    },
+    "[jinja-sql]": {
+        "editor.defaultFormatter": "innoverio.vscode-dbt-power-user",
+        "editor.formatOnSave": true
+    },
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "dbt.enableNewLineagePanel": true,
+    "editor.trimAutoWhitespace": true,
+    "diffEditor.ignoreTrimWhitespace": false,
 }
