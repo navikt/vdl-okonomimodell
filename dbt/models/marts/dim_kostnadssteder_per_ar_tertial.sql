@@ -5,7 +5,7 @@
 }}
 
 with
-    source as (select * from {{ ref("int_segmenter") }}),
+    source as (select * from {{ ref("int_segmenter__tertial") }}),
 
     column_selection as (
         select
