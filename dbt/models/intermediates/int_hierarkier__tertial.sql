@@ -6,11 +6,9 @@
 
 with
 
-    hierarchy_source as (
-        select * from {{ ref("stg_oebs__segment_hierarkier__tertial") }}
-    ),
+    hierarchy_source as (select * from {{ ref("int_hierarkier__tertial_siste_navn") }}),
 
-    segment_source as (select * from {{ ref("stg_oebs__segmenter__tertial") }}),
+    segment_source as (select * from {{ ref("int_segmenter__tertial_siste_navn") }}),
 
     recursive_hierarchy(
         id,
