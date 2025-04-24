@@ -1,0 +1,14 @@
+vdl_okonomimodell_profile:
+  target: "prod"
+  outputs:
+    prod:
+      type: "snowflake"
+      account: "wx23413.europe-west4.gcp"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "okonomimodell_transformer"
+      database: "okonomimodell"
+      warehouse: "okonomimodell_transformer"
+      schema: "PUBLIC"
+      threads: 8
+      client_session_keep_alive: False
