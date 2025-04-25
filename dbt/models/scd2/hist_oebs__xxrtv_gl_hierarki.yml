@@ -1,0 +1,67 @@
+unit_tests:
+  - name: hist_oebs__xxrtv_gl_hierarki__full_refresh_changes
+    model: hist_oebs__xxrtv_gl_hierarki
+    overrides:
+      macros:
+        is_incremental: false
+    given:
+      - input: source("oebs", "segmet_hierarki__test")
+        rows:
+          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-01 00:00:00', flex_value: 'foo'}
+          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-02 00:00:00', flex_value: 'bar'}
+    expect:
+      rows:
+        - {hierarchy_code: 'A', gyldig_fra_tidspunkt: '2020-01-01 00:00:00', gyldig_til_tidspunkt: '2020-01-02 00:00:00', flex_value: 'foo'}
+        - {hierarchy_code: 'A', gyldig_fra_tidspunkt: '2020-01-02 00:00:00', gyldig_til_tidspunkt: null, flex_value: 'bar'}
+
+  - name: hist_oebs__xxrtv_gl_hierarki__full_refresh_no_changes
+    model: hist_oebs__xxrtv_gl_hierarki
+    overrides:
+      macros:
+        is_incremental: false
+    given:
+      - input: source("oebs", "segmet_hierarki__test")
+        rows:
+          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-01 00:00:00', flex_value: 'foo'}
+          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-02 00:00:00', flex_value: 'foo'}
+    expect:
+      rows:
+        - {hierarchy_code: 'A', gyldig_fra_tidspunkt: '2020-01-01 00:00:00', gyldig_til_tidspunkt: null, flex_value: 'foo'}
+
+  - name: hist_oebs__xxrtv_gl_hierarki__full_refresh_deleted
+    model: hist_oebs__xxrtv_gl_hierarki
+    overrides:
+      macros:
+        is_incremental: false
+    given:
+      - input: source("oebs", "segmet_hierarki__test")
+        rows:
+          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-01 00:00:00', flex_value: 'foo'}
+          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-01 00:00:00', flex_value: 'bar'}
+          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-02 00:00:00', flex_value: 'foo'}
+    expect:
+      rows:
+        - {hierarchy_code: 'A', gyldig_fra_tidspunkt: '2020-01-01 00:00:00', gyldig_til_tidspunkt: null, flex_value: 'foo'}
+        - {hierarchy_code: 'A', gyldig_fra_tidspunkt: '2020-01-01 00:00:00', gyldig_til_tidspunkt: '2020-01-02 00:00:00', flex_value: 'bar'}
+
+#  - name: my_incremental_model_incremental_mode
+#    model: my_incremental_model
+#    overrides:
+#      macros:
+#        # unit test this model in "incremental" mode
+#        is_incremental: true
+#    given:
+#      - input: ref('events')
+#        rows:
+#          - {event_id: 1, event_time: 2020-01-01}
+#          - {event_id: 2, event_time: 2020-01-02}
+#          - {event_id: 3, event_time: 2020-01-03}
+#      - input: this
+#        # contents of current my_incremental_model
+#        rows:
+#          - {event_id: 1, event_time: 2020-01-01}
+#    expect:
+#      # what will be inserted/merged into my_incremental_model
+#      rows:
+#        - {event_id: 2, event_time: 2020-01-02}
+#        - {event_id: 3, event_time: 2020-01-03}
