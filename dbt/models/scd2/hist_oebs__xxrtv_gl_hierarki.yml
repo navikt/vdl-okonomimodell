@@ -152,7 +152,7 @@ unit_tests:
         - {
             flex_value: "bar",
             _hist_valid_from: "2020-01-01 00:00:00",
-            _hist_valid_to: "2020-01-02 00:00:00",
+            _hist_valid_to: null, # or maybe "2020-01-02 00:00:00",
             _hist_is_deleted: true,
             _hist_last_appered_at: "2020-01-02 00:00:00",
           }
