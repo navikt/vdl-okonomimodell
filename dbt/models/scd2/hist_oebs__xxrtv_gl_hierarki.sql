@@ -35,8 +35,7 @@ with
             flex_value_set_name,
             -- inbound-metadata
             _inbound__load_time,
-            cast(false as boolean) as er_slettet,
-            cast(null as timestamp) as slettet_dato
+
         from source
     ),
 
@@ -87,26 +86,37 @@ with
 
     filter_equal_hash_keys as (select * from equal_hash_keys where n = 1),
 
-    final as (
+    hist_columns_names as (
         select
-            flex_value_set_id,
-            hierarchy_code,
-            flex_value_id,
-            flex_value,
-            description,
-            flex_value_id_parent,
-            flex_value_parent,
-            description_parent,
-            flex_value_set_name,
-            -- inbound-metadata
-            _inbound__load_time,
-            hash_key,
-            --
-            _inbound__load_time as gyldig_fra_tidspunkt,
-            lead(_inbound__load_time) over (
-                partition by id order by _inbound__load_time
-            ) as gyldig_til_tidspunkt,
+            *,
+            hash_key as _hist_check_cols_hash,
+            id as _hist_key_hash,
+            cast(false as boolean) as _hist_is_deleted,
+            cast(null as timestamp) as _hist_last_appered_at,
+            _inbound__load_time as _hist_updated_at,
+            _hist_updated_at as _hist_valid_from,
+            lead(_hist_updated_at) over (
+                partition by id order by _hist_updated_at
+            ) as _hist_valid_to,
         from filter_equal_hash_keys
+    ),
+
+    final as (
+        select *,
+        -- flex_value_set_id,
+        -- hierarchy_code,
+        -- flex_value_id,
+        -- flex_value,
+        -- description,
+        -- flex_value_id_parent,
+        -- flex_value_parent,
+        -- description_parent,
+        -- flex_value_set_name,
+        -- -- inbound-metadata
+        -- _inbound__load_time,
+        -- hash_key,
+        -- --
+        from hist_columns_names
     )
 
 select *
