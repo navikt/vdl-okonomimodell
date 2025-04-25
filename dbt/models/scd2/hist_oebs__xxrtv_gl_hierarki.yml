@@ -7,12 +7,34 @@ unit_tests:
     given:
       - input: source("oebs", "segmet_hierarki__test")
         rows:
-          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-01 00:00:00', flex_value: 'foo'}
-          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-02 00:00:00', flex_value: 'bar'}
+          - {
+              hierarchy_code: "A",
+              flex_value: "foo",
+              _oppdatert_tidspunkt: "2020-01-01 00:00:00",
+              flex_value_parent: "bar",
+            }
+          - {
+              hierarchy_code: "A",
+              flex_value: "foo",
+              _oppdatert_tidspunkt: "2020-01-02 00:00:00",
+              flex_value_parent: "baz",
+            }
     expect:
       rows:
-        - {hierarchy_code: 'A', gyldig_fra_tidspunkt: '2020-01-01 00:00:00', gyldig_til_tidspunkt: '2020-01-02 00:00:00', flex_value: 'foo'}
-        - {hierarchy_code: 'A', gyldig_fra_tidspunkt: '2020-01-02 00:00:00', gyldig_til_tidspunkt: null, flex_value: 'bar'}
+        - {
+            hierarchy_code: "A",
+            flex_value: "foo",
+            gyldig_fra_tidspunkt: "2020-01-01 00:00:00",
+            gyldig_til_tidspunkt: "2020-01-02 00:00:00",
+            flex_value_parent: "bar",
+          }
+        - {
+            hierarchy_code: "A",
+            flex_value: "foo",
+            gyldig_fra_tidspunkt: "2020-01-02 00:00:00",
+            gyldig_til_tidspunkt: null,
+            flex_value_parent: "baz",
+          }
 
   - name: hist_oebs__xxrtv_gl_hierarki__full_refresh_no_changes
     model: hist_oebs__xxrtv_gl_hierarki
@@ -22,11 +44,24 @@ unit_tests:
     given:
       - input: source("oebs", "segmet_hierarki__test")
         rows:
-          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-01 00:00:00', flex_value: 'foo'}
-          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-02 00:00:00', flex_value: 'foo'}
+          - {
+              hierarchy_code: "A",
+              _oppdatert_tidspunkt: "2020-01-01 00:00:00",
+              flex_value: "foo",
+            }
+          - {
+              hierarchy_code: "A",
+              _oppdatert_tidspunkt: "2020-01-02 00:00:00",
+              flex_value: "foo",
+            }
     expect:
       rows:
-        - {hierarchy_code: 'A', gyldig_fra_tidspunkt: '2020-01-01 00:00:00', gyldig_til_tidspunkt: null, flex_value: 'foo'}
+        - {
+            hierarchy_code: "A",
+            gyldig_fra_tidspunkt: "2020-01-01 00:00:00",
+            gyldig_til_tidspunkt: null,
+            flex_value: "foo",
+          }
 
   - name: hist_oebs__xxrtv_gl_hierarki__full_refresh_deleted
     model: hist_oebs__xxrtv_gl_hierarki
@@ -36,14 +71,30 @@ unit_tests:
     given:
       - input: source("oebs", "segmet_hierarki__test")
         rows:
-          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-01 00:00:00', flex_value: 'foo'}
-          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-01 00:00:00', flex_value: 'bar'}
-          - {hierarchy_code: 'A', _oppdatert_tidspunkt: '2020-01-02 00:00:00', flex_value: 'foo'}
+          - {
+              flex_value: "foo",
+              _oppdatert_tidspunkt: "2020-01-01 00:00:00",
+            }
+          - {
+              flex_value: "bar",
+              _oppdatert_tidspunkt: "2020-01-01 00:00:00",
+            }
+          - {
+              flex_value: "foo",
+              _oppdatert_tidspunkt: "2020-01-02 00:00:00",
+            }
     expect:
       rows:
-        - {hierarchy_code: 'A', gyldig_fra_tidspunkt: '2020-01-01 00:00:00', gyldig_til_tidspunkt: null, flex_value: 'foo'}
-        - {hierarchy_code: 'A', gyldig_fra_tidspunkt: '2020-01-01 00:00:00', gyldig_til_tidspunkt: '2020-01-02 00:00:00', flex_value: 'bar'}
-
+        - {
+            flex_value: "foo",
+            gyldig_fra_tidspunkt: "2020-01-01 00:00:00",
+            gyldig_til_tidspunkt: null,
+          }
+        - {
+            flex_value: "bar",
+            gyldig_fra_tidspunkt: "2020-01-01 00:00:00",
+            gyldig_til_tidspunkt: "2020-01-02 00:00:00",
+          }
 #  - name: my_incremental_model_incremental_mode
 #    model: my_incremental_model
 #    overrides:

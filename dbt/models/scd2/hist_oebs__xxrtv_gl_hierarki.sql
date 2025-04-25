@@ -104,7 +104,7 @@ with
             --
             _inbound__load_time as gyldig_fra_tidspunkt,
             lead(_inbound__load_time) over (
-                partition by hash_key order by _inbound__load_time
+                partition by id order by _inbound__load_time
             ) as gyldig_til_tidspunkt,
         from filter_equal_hash_keys
     )
