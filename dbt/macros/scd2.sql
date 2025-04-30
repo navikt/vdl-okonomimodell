@@ -48,13 +48,46 @@
             from union_last_records
         ),
 
+        -- Alternative som finner siste rad per unique key
+        src_hash as (
+            select
+                *,
+                {{ dbt_utils.generate_surrogate_key(unique_key) }}
+                as _scd2_unique_key_hash,
+                {{ dbt_utils.generate_surrogate_key(check_cols) }}
+                as _scd2_check_cols_hash,
+                {{ loaded_at }} as _scd2_loaded_at,
+            from src
+        ),
+
+        last_records as (
+            select
+                {{ dbt_utils.star(from=relation, quote_identifiers=false) }},
+                _scd2_unique_key_hash,
+                _scd2_check_cols_hash,
+                _scd2_loaded_at
+            from {{ this }} as this
+            qualify
+                max(_scd2_loaded_at) over (partition by _scd2_unique_key_hash)
+                = this._scd2_loaded_at
+        ),
+
+        alternate_union_last_records as (
+            select *
+            from src_hash
+            union all
+            select *
+            from last_records
+        ),
+
+        --
         last_values as (
             select
                 *,
                 lag(_scd2_check_cols_hash, 1, '1') over (
                     partition by _scd2_unique_key_hash order by _scd2_loaded_at
                 ) _scd2_last_check_cols_hash,
-            from meta_hashes
+            from alternate_union_last_records
         ),
 
         changed_records as (
@@ -79,18 +112,35 @@
             from changed_records
         ),
 
+        filter_out_existing_records as (
+            select *
+            from meta_columns
+            where
+                not exists (
+                    select 1
+                    from {{ this }} as this
+                    where meta_columns._scd2_record_hash = this._scd2_record_hash
+                )
+        ),
+
         record_timestamps as (
             select
-                meta_columns.*,
-                current_timestamp as _scd2_record_loaded_at,
+                filter_out_existing_records.*,
+                coalesce(
+                    this._scd2_record_loaded_at, current_timestamp
+                ) as _scd2_record_loaded_at,
                 current_timestamp as _scd2_updated_at,
-            from meta_columns
+            from filter_out_existing_records
+            left join
+                {{ this }} as this
+                on filter_out_existing_records._scd2_record_hash
+                = this._scd2_record_hash
         ),
 
         final as (select * from record_timestamps)
 
     select *
-    from union_last_records
+    from final
 {% endmacro %}
 
 {% macro _scd2__full_refresh(relation, unique_key, check_cols, loaded_at) %}
