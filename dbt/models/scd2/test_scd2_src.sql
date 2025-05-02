@@ -25,3 +25,5 @@ union all
 select 1 as id, '2024-08-01'::timestamp as t, 'baz' as val
 union all
 select 2 as id, '2024-08-01'::timestamp as t, 'baz' as val
+union all
+select 2 as id, '2024-09-01'::timestamp as t, 'foobar' as val

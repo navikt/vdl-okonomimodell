@@ -1,15 +1,1 @@
-{{
-    hist(
-        relation=source("oebs", "segmet_hierarki__test"),
-        entity_key=["hierarchy_code", "flex_value_id"],
-        check_cols=[
-            "flex_value",
-            "description",
-            "flex_value_id_parent",
-            "flex_value_parent",
-            "description_parent",
-            "flex_value_set_name",
-        ],
-        loaded_at="_oppdatert_tidspunkt",
-    )
-}}
+{{ scd2(relation=ref("test_hist__segment")) }}
