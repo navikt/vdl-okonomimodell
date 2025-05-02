@@ -1,5 +1,5 @@
 {{
-    scd2(
+    hist(
         relation=source("oebs", "segmet_hierarki__test"),
         entity_key=["hierarchy_code", "flex_value_id"],
         check_cols=[
