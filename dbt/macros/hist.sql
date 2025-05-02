@@ -1,6 +1,4 @@
 {% macro hist(relation, entity_key, check_cols, loaded_at) %}
-    {{ log("hist macro called", info=True) }}
-
     {{
         config(
             materialized="incremental",
@@ -23,32 +21,6 @@
             where {{ loaded_at }} > (select max(_hist_loaded_at) from {{ this }})
         ),
 
-        union_last_records as (
-            select *
-            from src
-            union all
-            select {{ dbt_utils.star(from=relation, quote_identifiers=false) }}
-            from {{ this }} as this
-            where
-                _hist_loaded_at = (
-                    select max(_hist_loaded_at)
-                    from {{ this }} as old
-                    where old._hist_entity_key_hash = this._hist_entity_key_hash
-                )
-        ),
-
-        meta_hashes as (
-            select
-                *,
-                {{ dbt_utils.generate_surrogate_key(entity_key) }}
-                as _hist_entity_key_hash,
-                {{ dbt_utils.generate_surrogate_key(check_cols) }}
-                as _hist_check_cols_hash,
-                {{ loaded_at }} as _hist_loaded_at,
-            from union_last_records
-        ),
-
-        -- Alternative som finner siste rad per unique key
         src_hash as (
             select
                 *,
@@ -72,7 +44,7 @@
                 = this._hist_loaded_at
         ),
 
-        alternate_union_last_records as (
+        union_records as (
             select *, true as _hist_is_new_record
             from src_hash
             union all
@@ -87,7 +59,7 @@
                 lag(_hist_check_cols_hash, 1, '1') over (
                     partition by _hist_entity_key_hash order by _hist_loaded_at
                 ) _hist_last_check_cols_hash,
-            from alternate_union_last_records
+            from union_records
         ),
 
         changed_records as (
