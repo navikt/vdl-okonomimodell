@@ -1,4 +1,4 @@
-{% macro hist(relation, entity_key, check_cols, loaded_at) %}
+{% macro hist(from, entity_key, check_cols, loaded_at) %}
     {{
         config(
             materialized="incremental",
@@ -8,16 +8,16 @@
     }}
 
     {% if is_incremental() %}
-        {{ _hist__incremental(relation, entity_key, check_cols, loaded_at) }}
-    {% else %} {{ _hist__full_refresh(relation, entity_key, check_cols, loaded_at) }}
+        {{ _hist__incremental(from, entity_key, check_cols, loaded_at) }}
+    {% else %} {{ _hist__full_refresh(from, entity_key, check_cols, loaded_at) }}
     {% endif %}
 {% endmacro %}
 
-{% macro _hist__incremental(relation, entity_key, check_cols, loaded_at) %}
+{% macro _hist__incremental(from, entity_key, check_cols, loaded_at) %}
     with
         src as (
             select *
-            from {{ relation }}
+            from {{ from }}
             where {{ loaded_at }} > (select max(_hist_loaded_at) from {{ this }})
         ),
 
@@ -34,7 +34,7 @@
 
         last_records as (
             select
-                {{ dbt_utils.star(from=relation, quote_identifiers=false) }},
+                {{ dbt_utils.star(from=from, quote_identifiers=false) }},
                 _hist_entity_key_hash,
                 _hist_check_cols_hash,
                 _hist_loaded_at
@@ -80,7 +80,7 @@
                 *,
                 {{ dbt_utils.generate_surrogate_key(entity_key + [loaded_at]) }}
                 as _hist_record_hash,
-                '{{ relation }}' as _hist_input__relation,
+                '{{ from }}' as _hist_input__from,
                 {{ entity_key }} as _hist_input__entity_key,
                 {{ check_cols }} as _hist_input__check_cols,
                 '{{ loaded_at }}' as _hist_input__loaded_at,
@@ -94,17 +94,17 @@
     from final
 {% endmacro %}
 
-{% macro _hist__full_refresh(relation, entity_key, check_cols, loaded_at) %}
+{% macro _hist__full_refresh(from, entity_key, check_cols, loaded_at) %}
     with
         src as (
             select
-                relation.*,
+                *,
                 {{ dbt_utils.generate_surrogate_key(entity_key) }}
                 as _hist_entity_key_hash,
                 {{ dbt_utils.generate_surrogate_key(check_cols) }}
                 as _hist_check_cols_hash,
                 {{ loaded_at }} as _hist_loaded_at,
-            from {{ relation }} as relation
+            from {{ from }}
         ),
 
         last_values as (
@@ -131,7 +131,7 @@
                 changed_records.*,
                 {{ dbt_utils.generate_surrogate_key(entity_key + [loaded_at]) }}
                 as _hist_record_hash,
-                '{{ relation }}' as _hist_input__relation,
+                '{{ from }}' as _hist_input__from,
                 {{ entity_key }} as _hist_input__entity_key,
                 {{ check_cols }} as _hist_input__check_cols,
                 '{{ loaded_at }}' as _hist_input__loaded_at,
