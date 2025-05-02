@@ -29,15 +29,7 @@
             {% endif %}
         ),
 
-        _final as (
-            select
-                _hist_record_hash as pk_{{ relation.name }},
-                _hist_entity_key_hash as ek_{{ relation.name }},
-                *,
-                _scd2_valid_from as gyldig_fra,
-                coalesce(_scd2_valid_to, '9999-01-01 00:00:00') as gyldig_til
-            from _scd2_cte
-        )
+        _final as (select *, from _scd2_cte)
     select *
     from _final
 
@@ -57,13 +49,7 @@
         _last_valid_records as (
             select
                 this.* exclude(
-                    _scd2_valid_from,
-                    _scd2_valid_to,
-                    _scd2_record_updated_at,
-                    pk_{{ relation.name }},
-                    ek_{{ relation.name }},
-                    gyldig_fra_tidspunkt,
-                    gyldig_til_tidspunkt
+                    _scd2_valid_from, _scd2_valid_to, _scd2_record_updated_at
                 ),
                 current_timestamp as _scd2_record_updated_at
             from {{ this }} as this
