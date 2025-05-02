@@ -34,16 +34,16 @@
         src as (
             select
                 *,
-                current_timestamp as _scd2_updated_at,
-                _scd2_updated_at as _scd2_created_at
+                current_timestamp as _scd2_record_updated_at,
+                _scd2_record_updated_at as _scd2_record_created_at
             from {{ relation }}
             where {{ created_at }} > (select max({{ created_at }}) from {{ this }})
         ),
 
         last_valid_records as (
             select
-                this.* exclude(_scd2_valid_from, _scd2_valid_to, _scd2_updated_at),
-                current_timestamp as _scd2_updated_at
+                this.* exclude(_scd2_valid_from, _scd2_valid_to, _scd2_record_updated_at),
+                current_timestamp as _scd2_record_updated_at
             from {{ this }} as this
             inner join src on this.{{ entity_key }} = src.{{ entity_key }}
             where this._scd2_valid_to is null
@@ -90,8 +90,8 @@
         meta_data as (
             select
                 *,
-                current_timestamp as _scd2_updated_at,
-                _scd2_updated_at as _scd2_created_at
+                current_timestamp as _scd2_record_updated_at,
+                _scd2_record_updated_at as _scd2_record_created_at
             from valid_to_from
         ),
 
