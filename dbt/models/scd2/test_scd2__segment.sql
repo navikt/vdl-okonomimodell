@@ -1,1 +1,1 @@
-{{ scd2(relation=ref("test_hist__segment")) }}
+{{ scd2(from=ref("test_hist__segment")) }}

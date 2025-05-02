@@ -1,5 +1,5 @@
 {% macro scd2(
-    relation,
+    from,
     unique_key="_hist_record_hash",
     entity_key="_hist_entity_key_hash",
     created_at="_hist_record_created_at",
@@ -17,13 +17,13 @@
             {% if is_incremental() %}
                 {{
                     _scd2__incremental(
-                        relation, unique_key, entity_key, created_at, loaded_at
+                        from, unique_key, entity_key, created_at, loaded_at
                     )
                 }}
             {% else %}
                 {{
                     _scd2__full_refresh(
-                        relation, unique_key, entity_key, created_at, loaded_at
+                        from, unique_key, entity_key, created_at, loaded_at
                     )
                 }}
             {% endif %}
@@ -35,14 +35,14 @@
 
 {% endmacro %}
 
-{% macro _scd2__incremental(relation, unique_key, entity_key, created_at, loaded_at) %}
+{% macro _scd2__incremental(from, unique_key, entity_key, created_at, loaded_at) %}
     with
         _src as (
             select
                 *,
                 current_timestamp as _scd2_record_updated_at,
                 _scd2_record_updated_at as _scd2_record_created_at
-            from {{ relation }}
+            from {{ from }}
             where {{ created_at }} > (select max({{ created_at }}) from {{ this }})
         ),
 
@@ -81,9 +81,9 @@
 
 {% endmacro %}
 
-{% macro _scd2__full_refresh(relation, unique_key, entity_key, created_at, loaded_at) %}
+{% macro _scd2__full_refresh(from, unique_key, entity_key, created_at, loaded_at) %}
     with
-        _src as (select * from {{ relation }}),
+        _src as (select * from {{ from }}),
 
         _valid_to_from as (
             select
