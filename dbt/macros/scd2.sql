@@ -29,22 +29,23 @@
             {% endif %}
         ),
 
-        _scd2_rename_cols as (select {{ _scd2_rename_cols() }}, * from _scd2_cte),
+        _scd2_rename_cols as (
+            select
+                _hist_record_hash as pk_{{ this.name }},
+                _hist_entity_key_hash as ek_{{ this.name }},
+                _hist_loaded_at as lastet_tidspunkt,
+                _scd2_record_updated_at as oppdatert_tidspunkt,
+                _hist_record_created_at as opprettet_tidspunkt,
+                _scd2_valid_from as gyldig_fra,
+                _scd2_valid_to as gyldig_til,
+                *,
+            from _scd2_cte
+        ),
 
         _final as (select *, from _scd2_rename_cols)
     select *
     from _final
 
-{% endmacro %}
-
-{% macro _scd2_rename_cols() %}
-    _hist_record_hash as pk_{{ this.name }},
-    _hist_entity_key_hash as ek_{{ this.name }},
-    _hist_loaded_at as lastet_tidspunkt,
-    _scd2_record_updated_at as oppdatert_tidspunkt,
-    _hist_record_created_at as opprettet_tidspunkt,
-    _scd2_valid_from as gyldig_fra,
-    _scd2_valid_to as gyldig_til
 {% endmacro %}
 
 {% macro _scd2__incremental(from, unique_key, entity_key, created_at, loaded_at) %}
