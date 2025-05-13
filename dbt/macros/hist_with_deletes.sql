@@ -25,7 +25,7 @@
                 {{ dbt_utils.generate_surrogate_key(entity_key + [loaded_at]) }}
                 as _hist_record_hash,
                 {{ loaded_at }} as _hist_loaded_at,
-                lead(_hist_loaded_at, 1, '1') over (
+                lead(_hist_loaded_at, 1, null) over (
                     partition by _hist_entity_key_hash order by _hist_loaded_at
                 ) as _hist_next_loaded_at,
             from src
@@ -36,7 +36,7 @@
         load_times as (
             select
                 _hist_loaded_at,
-                lead(_hist_loaded_at, 1, '1') over (
+                lead(_hist_loaded_at, 1, null) over (
                     order by _hist_loaded_at
                 ) as _hist_next_loaded_at,
             from unique_loaded_at
@@ -47,7 +47,8 @@
                 metadata.*,
                 case
                     when
-                        metadata._hist_next_loaded_at != load_times._hist_next_loaded_at
+                        coalesce(metadata._hist_next_loaded_at, '1'::timestamp)
+                        != coalesce(load_times._hist_next_loaded_at, '1'::timestamp)
                     then true
                     else false
                 end as _hist_is_deleted
