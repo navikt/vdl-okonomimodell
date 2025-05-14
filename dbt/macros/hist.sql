@@ -1,0 +1,152 @@
+{% macro hist(from, entity_key, check_cols, loaded_at) %}
+    {{
+        config(
+            materialized="incremental",
+            entity_key="_hist_record_hash",
+            on_schema_change="fail",
+        )
+    }}
+
+    {% if is_incremental() %}
+        {{ _hist__incremental(from, entity_key, check_cols, loaded_at) }}
+    {% else %} {{ _hist__full_refresh(from, entity_key, check_cols, loaded_at) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro _hist__incremental(from, entity_key, check_cols, loaded_at) %}
+    with
+        src as (
+            select *
+            from {{ from }}
+            where {{ loaded_at }} > (select max(_hist_loaded_at) from {{ this }})
+        ),
+
+        src_hash as (
+            select
+                *,
+                {{ dbt_utils.generate_surrogate_key(entity_key) }}
+                as _hist_entity_key_hash,
+                {{ dbt_utils.generate_surrogate_key(check_cols) }}
+                as _hist_check_cols_hash,
+                {{ loaded_at }} as _hist_loaded_at,
+            from src
+        ),
+
+        last_records as (
+            select
+                {{ dbt_utils.star(from=from, quote_identifiers=false) }},
+                _hist_entity_key_hash,
+                _hist_check_cols_hash,
+                _hist_loaded_at
+            from {{ this }} as this
+            qualify
+                max(_hist_loaded_at) over (partition by _hist_entity_key_hash)
+                = this._hist_loaded_at
+        ),
+
+        union_records as (
+            select *, true as _hist_is_new_record
+            from src_hash
+            union all
+            select *, false as _hist_is_new_record
+            from last_records
+        ),
+
+        --
+        last_values as (
+            select
+                *,
+                lag(_hist_check_cols_hash, 1, '1') over (
+                    partition by _hist_entity_key_hash order by _hist_loaded_at
+                ) _hist_last_check_cols_hash,
+            from union_records
+        ),
+
+        changed_records as (
+            select
+                *,
+                _hist_check_cols_hash
+                != _hist_last_check_cols_hash as _hist_record_has_change
+            from last_values
+            where _hist_record_has_change
+        ),
+
+        filter_out_existing_records as (
+            select * from changed_records where _hist_is_new_record
+        ),
+
+        meta_columns as (
+            select
+                *,
+                {{ dbt_utils.generate_surrogate_key(entity_key + [loaded_at]) }}
+                as _hist_record_hash,
+                '{{ from }}' as _hist_input__from,
+                {{ entity_key }} as _hist_input__entity_key,
+                {{ check_cols }} as _hist_input__check_cols,
+                '{{ loaded_at }}' as _hist_input__loaded_at,
+                current_timestamp as _hist_record_created_at,
+            from filter_out_existing_records
+        ),
+
+        final as (select * from meta_columns)
+
+    select *
+    from final
+{% endmacro %}
+
+{% macro _hist__full_refresh(from, entity_key, check_cols, loaded_at) %}
+    with
+        src as (
+            select
+                *,
+                {{ dbt_utils.generate_surrogate_key(entity_key) }}
+                as _hist_entity_key_hash,
+                {{ dbt_utils.generate_surrogate_key(check_cols) }}
+                as _hist_check_cols_hash,
+                {{ loaded_at }} as _hist_loaded_at,
+            from {{ from }}
+        ),
+
+        last_values as (
+            select
+                *,
+                lag(_hist_check_cols_hash, 1, '1') over (
+                    partition by _hist_entity_key_hash order by _hist_loaded_at
+                ) _hist_last_check_cols_hash,
+            from src
+        ),
+
+        changed_records as (
+            select
+                *,
+                case
+                    when _hist_check_cols_hash != _hist_last_check_cols_hash then true
+                end as _hist_record_has_change
+            from last_values
+            where _hist_record_has_change
+        ),
+
+        meta_columns as (
+            select
+                changed_records.*,
+                {{ dbt_utils.generate_surrogate_key(entity_key + [loaded_at]) }}
+                as _hist_record_hash,
+                '{{ from }}' as _hist_input__from,
+                {{ entity_key }} as _hist_input__entity_key,
+                {{ check_cols }} as _hist_input__check_cols,
+                '{{ loaded_at }}' as _hist_input__loaded_at,
+                true as _hist_is_new_record,
+            from changed_records
+        ),
+
+        record_timestamps as (
+            select meta_columns.*, current_timestamp as _hist_record_created_at,
+            from meta_columns
+        ),
+
+        final as (select * from record_timestamps)
+
+    select *
+    from final
+    order by _hist_loaded_at, _hist_entity_key_hash
+{% endmacro %}

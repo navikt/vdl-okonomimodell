@@ -33,4 +33,5 @@
     "dbt.enableNewLineagePanel": true,
     "editor.trimAutoWhitespace": true,
     "diffEditor.ignoreTrimWhitespace": false,
+    "dbt.perspectiveTheme": "Vintage",
 }
