@@ -38,11 +38,6 @@ with
         where segment_type = 'OR_KSTED'
     ),
 
-    final as (
-        select
-            * exclude (pk_dim_kostnadssteder_per_ar_tertial),  -- TEST: er kun midlertidg
-            segment_id || '-' || ar_tertial as pk_dim_kostnadssteder_per_ar  -- TEST: er kun midlertidg
-        from column_selection
-    )
+    final as (select * from column_selection)
 select *
 from final
