@@ -52,6 +52,59 @@
             from last_records
         ),
 
+        entity_key_load_times as (
+            select
+                *,
+                lead(_hist_loaded_at) over (
+                    partition by _hist_entity_key_hash order by _hist_loaded_at
+                ) as _hist_entity_key_next_load_time,
+            from union_records
+        ),
+
+        unique_load_times as (
+            select distinct _hist_loaded_at,
+            from src_hash
+            union all
+            select max(_hist_loaded_at) as _hist_loaded_at,
+            from {{ this }}
+            order by 1
+        ),
+
+        load_times as (
+            select
+                _hist_loaded_at,
+                lead(_hist_loaded_at) over (
+                    order by _hist_loaded_at
+                ) as _hist_next_loaded_at
+            from unique_load_times
+        ),
+
+        deletes as (
+            select
+                entity_key_load_times.*,
+                load_times._hist_next_loaded_at,
+                case
+                    when
+                        entity_key_load_times._hist_entity_key_next_load_time
+                        != load_times._hist_next_loaded_at
+                    then true
+                    when
+                        entity_key_load_times._hist_entity_key_next_load_time is null
+                        and load_times._hist_next_loaded_at is not null
+                    then true
+                    else false
+                end as _hist_entity_key_is_deleted,
+                case
+                    when _hist_entity_key_is_deleted
+                    then load_times._hist_next_loaded_at
+                    else null
+                end as _hist_entity_key_deleted_at
+            from entity_key_load_times
+            left join
+                load_times
+                on entity_key_load_times._hist_loaded_at = load_times._hist_loaded_at
+        ),
+
         --
         last_values as (
             select
@@ -59,19 +112,29 @@
                 lag(_hist_check_cols_hash, 1, '1') over (
                     partition by _hist_entity_key_hash order by _hist_loaded_at
                 ) _hist_last_check_cols_hash,
-            from union_records
+                lag(_hist_entity_key_is_deleted, 1, false) over (
+                    partition by _hist_entity_key_hash order by _hist_loaded_at
+                ) _hist_last_entity_key_is_deleted,
+            from deletes
         ),
 
         changed_records as (
             select
                 *,
-                _hist_check_cols_hash
-                != _hist_last_check_cols_hash as _hist_record_has_change
+                case
+                    when _hist_last_entity_key_is_deleted
+                    then true
+                    when _hist_entity_key_is_deleted
+                    then true
+                    when _hist_check_cols_hash != _hist_last_check_cols_hash
+                    then true
+                end as _hist_record_has_change
             from last_values
             where _hist_record_has_change
         ),
 
         filter_out_existing_records as (
+            -- TODO: Må kanskje ta høyde for at en gammel record kan oppdatere seg
             select * from changed_records where _hist_is_new_record
         ),
 
@@ -107,20 +170,76 @@
             from {{ from }}
         ),
 
+        entity_key_load_times as (
+            select
+                *,
+                lead(_hist_loaded_at) over (
+                    partition by _hist_entity_key_hash order by _hist_loaded_at
+                ) as _hist_entity_key_next_load_time,
+            from src
+        ),
+
+        unique_load_times as (
+            select distinct _hist_loaded_at, from src order by _hist_loaded_at
+        ),
+
+        load_times as (
+            select
+                _hist_loaded_at,
+                lead(_hist_loaded_at) over (
+                    order by _hist_loaded_at
+                ) as _hist_next_loaded_at
+            from unique_load_times
+        ),
+
+        deletes as (
+            select
+                entity_key_load_times.*,
+                load_times._hist_next_loaded_at,
+                case
+                    when
+                        entity_key_load_times._hist_entity_key_next_load_time
+                        != load_times._hist_next_loaded_at
+                    then true
+                    when
+                        entity_key_load_times._hist_entity_key_next_load_time is null
+                        and load_times._hist_next_loaded_at is not null
+                    then true
+                    else false
+                end as _hist_entity_key_is_deleted,
+                case
+                    when _hist_entity_key_is_deleted
+                    then load_times._hist_next_loaded_at
+                    else null
+                end as _hist_entity_key_deleted_at
+            from entity_key_load_times
+            left join
+                load_times
+                on entity_key_load_times._hist_loaded_at = load_times._hist_loaded_at
+        ),
+
         last_values as (
             select
                 *,
                 lag(_hist_check_cols_hash, 1, '1') over (
                     partition by _hist_entity_key_hash order by _hist_loaded_at
                 ) _hist_last_check_cols_hash,
-            from src
+                lag(_hist_entity_key_is_deleted, 1, false) over (
+                    partition by _hist_entity_key_hash order by _hist_loaded_at
+                ) _hist_last_entity_key_is_deleted,
+            from deletes
         ),
 
         changed_records as (
             select
                 *,
                 case
-                    when _hist_check_cols_hash != _hist_last_check_cols_hash then true
+                    when _hist_last_entity_key_is_deleted
+                    then true
+                    when _hist_entity_key_is_deleted
+                    then true
+                    when _hist_check_cols_hash != _hist_last_check_cols_hash
+                    then true
                 end as _hist_record_has_change
             from last_values
             where _hist_record_has_change
