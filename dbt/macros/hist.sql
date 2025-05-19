@@ -33,11 +33,7 @@
         ),
 
         last_records as (
-            select
-                {{ dbt_utils.star(from=from, quote_identifiers=false) }},
-                _hist_entity_key_hash,
-                _hist_check_cols_hash,
-                _hist_loaded_at
+            select *
             from {{ this }} as this
             qualify
                 max(_hist_loaded_at) over (partition by _hist_entity_key_hash)
@@ -45,10 +41,31 @@
         ),
 
         union_records as (
-            select *, true as _hist_is_new_record
+            select *
             from src_hash
             union all
-            select *, false as _hist_is_new_record
+            select
+                * exclude(
+                    _hist_entity_key_hash,
+                    _hist_check_cols_hash,
+                    _hist_loaded_at,
+                    _hist_entity_key_next_load_time,
+                    _hist_next_loaded_at,
+                    _hist_entity_key_is_deleted,
+                    _hist_entity_key_deleted_at,
+                    _hist_last_check_cols_hash,
+                    _hist_last_entity_key_is_deleted,
+                    _hist_record_has_change,
+                    _hist_record_hash,
+                    _hist_input__from,
+                    _hist_input__entity_key,
+                    _hist_input__check_cols,
+                    _hist_input__loaded_at,
+                    _hist_record_created_at
+                ),
+                _hist_entity_key_hash,
+                _hist_check_cols_hash,
+                _hist_loaded_at
             from last_records
         ),
 
@@ -133,11 +150,6 @@
             where _hist_record_has_change
         ),
 
-        filter_out_existing_records as (
-            -- TODO: Må kanskje ta høyde for at en gammel record kan oppdatere seg
-            select * from changed_records where _hist_is_new_record
-        ),
-
         meta_columns as (
             select
                 *,
@@ -148,10 +160,24 @@
                 {{ check_cols }} as _hist_input__check_cols,
                 '{{ loaded_at }}' as _hist_input__loaded_at,
                 current_timestamp as _hist_record_created_at,
-            from filter_out_existing_records
+            from changed_records
         ),
 
-        final as (select * from meta_columns)
+        filter_out_existing_records as (
+            -- TODO: Kan kanskje sjekke det her på en annen måte?
+            select meta_columns.*
+            from meta_columns
+            left join
+                {{ this }} this
+                on meta_columns._hist_record_hash = this._hist_record_hash
+                and meta_columns._hist_last_entity_key_is_deleted
+                = this._hist_last_entity_key_is_deleted
+                and meta_columns._hist_entity_key_is_deleted
+                = this._hist_entity_key_is_deleted
+            where this._hist_record_hash is null
+        ),
+
+        final as (select * from filter_out_existing_records)
 
     select *
     from final
@@ -254,7 +280,6 @@
                 {{ entity_key }} as _hist_input__entity_key,
                 {{ check_cols }} as _hist_input__check_cols,
                 '{{ loaded_at }}' as _hist_input__loaded_at,
-                true as _hist_is_new_record,
             from changed_records
         ),
 
