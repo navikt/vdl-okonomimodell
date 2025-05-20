@@ -12,7 +12,7 @@ with
             ) as periodenummer,
             period_year as ar,
             period_num as nummer,
-            end_date as til_dato
+            to_timestamp(dateadd('d', 1, end_date)) as til_dato
         from source
         where period_num in (4, 8, 13)
         group by all
