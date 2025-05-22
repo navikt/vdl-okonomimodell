@@ -45,6 +45,8 @@ models:
       +secure: true
     intermediates:
       +schema: intermediates
+    scd2:
+      +schema: stages
   elementary:
     +schema: meta
   +meta:
