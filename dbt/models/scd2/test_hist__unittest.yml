@@ -217,3 +217,36 @@ unit_tests:
             _hist_loaded_at: "2024-01-02 00:00:00",
             _hist_entity_key_is_deleted: false,
           }
+
+  - name: test_hist_new_record_when_last_entity_key_was_deleted__full_refresh
+    description: "Test that new record is inserted when last entity key was deleted"
+    model: test_hist
+    overrides:
+      macros:
+        is_incremental: false
+    given:
+      - input: ref('test_scd2_src')
+        rows:
+          - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
+          - { id: 2, t: "2024-01-02 00:00:00", val: "bar" }
+          - { id: 1, t: "2024-01-03 00:00:00", val: "foo" }
+          - { id: 2, t: "2024-01-03 00:00:00", val: "bar" }
+    expect:
+      rows:
+        - {
+            id: 1,
+            _hist_loaded_at: "2024-01-01 00:00:00",
+            _hist_entity_key_is_deleted: true,
+          }
+        - {
+            id: 2,
+            _hist_loaded_at: "2024-01-02 00:00:00",
+            _hist_entity_key_is_deleted: false,
+          }
+        - {
+            id: 1,
+            _hist_loaded_at: "2024-01-03 00:00:00",
+            _hist_entity_key_is_deleted: false,
+          }
+
+  #- name: test_hist_new_record_when_last_entity_key_was_deleted__incremental
