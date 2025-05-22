@@ -7,5 +7,6 @@ sources:
     tables:
       - name: xxrtv_gl_segment_v
       - name: xxrtv_gl_hierarki_v
-      - name: xxrtv_gl_hierarki_v__v1
+        identifier: xxrtv_gl_hierarki_v__v1
+      #- name: xxrtv_gl_hierarki_v__v1
       - name: xxrtv_gl_period_status_v
