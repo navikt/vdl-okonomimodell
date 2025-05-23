@@ -1,85 +1,54 @@
-version: "1.0"
-
-# Databases
 databases:
-  - okonomimodell:
-      shared: no
-      owner: sysadmin
-      schemas:
-        - stages
-        - intermediates
-        - marts
-        - oebs
-        - meta
-        - csv
-
-# Roles
-roles:
-  - okonomimodell_transformer:
-      warehouses:
-        - okonomimodell_transformer
-      privileges:
-        databases:
-          read:
-            - okonomimodell
-        schemas:
-          read:
-            - okonomimodell.stages
-            - okonomimodell.csv
-            - okonomimodell.intermediates
-            - okonomimodell.marts
-            - okonomimodell.meta
-            - okonomimodell.oebs
-          write:
-            - okonomimodell.stages
-            - okonomimodell.csv
-            - okonomimodell.intermediates
-            - okonomimodell.marts
-            - okonomimodell.meta
-            - okonomimodell.oebs
-        tables:
-          read:
-            - okonomimodell.stages.*
-            - okonomimodell.csv.*
-            - okonomimodell.intermediates.*
-            - okonomimodell.marts.*
-            - okonomimodell.meta.*
-            - okonomimodell.oebs.*
-          write:
-            - okonomimodell.stages.*
-            - okonomimodell.csv.*
-            - okonomimodell.intermediates.*
-            - okonomimodell.marts.*
-            - okonomimodell.meta.*
-            - okonomimodell.oebs.*
-      owns:
-        tables:
-          - okonomimodell.stages.*
-          - okonomimodell.csv.*
-          - okonomimodell.intermediates.*
-          - okonomimodell.marts.*
-          - okonomimodell.meta.*
-          - okonomimodell.oebs.*
-      owner: useradmin
-
-  - okonomimodell_reporter:
-      privileges:
-        databases:
-          read:
-            - okonomimodell
-        schemas:
-          read:
-            - okonomimodell.marts
-            - okonomimodell.meta
-        tables:
-          read:
-            - okonomimodell.marts.*
-            - okonomimodell.meta.*
-      owner: useradmin
-
+  - name: okonomimodell
+    transient: false
+    data_retention_time_in_days: 1
+    schemas:
+      - name: stages
+      - name: intermediates
+      - name: marts
+      - name: oebs
+      - name: meta
+      - name: csv
+      
 warehouses:
-  - okonomimodell_transformer:
-      size: x-small
-      owner: sysadmin
+  - name: okonomimodell_transformer
+
+users:
+  - name: srv_okonomimodell_runner
+    type: legacy_service
+      
+roles:
+  - name: okonomimodell_transformer
+  - name: okonomimodell_reporter
+      
+grants:
+  - role: okonomimodell_transformer   
+    warehouses:
+        - okonomimodell_transformer
+    write_on_schemas:
+        - okonomimodell.stages
+        - okonomimodell.csv
+        - okonomimodell.intermediates
+        - okonomimodell.marts
+        - okonomimodell.meta
+        - okonomimodell.oebs
+    to_users:
+        - srv_okonomimodell_runner
+    to_roles:
+        - airflow_orchestrator
+  - role: okonomimodell_reporter
+    read_on_schemas:
+            - okonomimodell.marts
+            - okonomimodell.meta
+    to_roles:
+        - eiendom_transformer
+        - faktura_transformer
+        - innkjop_transformer
+        - regnskap_transformer
+        - reporting_airflow
+        - reporting_transformer
+
+
+
 
 
