@@ -1,15 +1,10 @@
 {{
     hist(
-        from=source("oebs", "segmet_hierarki__test"),
-        entity_key=["hierarchy_code", "flex_value_id"],
+        from=ref("test_segment_src"),
+        entity_key=["flex_value_id"],
         check_cols=[
-            "flex_value",
-            "description",
-            "flex_value_id_parent",
-            "flex_value_parent",
-            "description_parent",
-            "flex_value_set_name",
+            "last_update_date",
         ],
-        loaded_at="_oppdatert_tidspunkt",
+        loaded_at="current_timestamp()",
     )
 }}
