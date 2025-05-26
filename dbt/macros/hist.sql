@@ -153,7 +153,7 @@
         meta_columns as (
             select
                 *,
-                {{ dbt_utils.generate_surrogate_key(entity_key + [loaded_at]) }}
+                {{ dbt_utils.generate_surrogate_key(entity_key + ["_hist_loaded_at"]) }}
                 as _hist_record_hash,
                 '{{ from }}' as _hist_input__from,
                 {{ entity_key }} as _hist_input__entity_key,
