@@ -3,7 +3,9 @@
     unique_key="_hist_record_hash",
     entity_key="_hist_entity_key_hash",
     created_at="_hist_record_created_at",
-    loaded_at="_hist_loaded_at"
+    loaded_at="_hist_loaded_at",
+    first_valid_from="1900-01-01 00:00:00",
+    last_valid_to="9999-01-01 23:59:59"
 ) %}
     {{
         config(
@@ -17,13 +19,13 @@
             {% if is_incremental() %}
                 {{
                     _scd2__incremental(
-                        from, unique_key, entity_key, created_at, loaded_at
+                        from, unique_key, entity_key, created_at, loaded_at, first_valid_from, last_valid_to
                     )
                 }}
             {% else %}
                 {{
                     _scd2__full_refresh(
-                        from, unique_key, entity_key, created_at, loaded_at
+                        from, unique_key, entity_key, created_at, loaded_at, first_valid_from, last_valid_to
                     )
                 }}
             {% endif %}
@@ -48,7 +50,7 @@
 
 {% endmacro %}
 
-{% macro _scd2__incremental(from, unique_key, entity_key, created_at, loaded_at) %}
+{% macro _scd2__incremental(from, unique_key, entity_key, created_at, loaded_at, first_valid_from, last_valid_to) %}
     with
         _src as (
             select *, current_timestamp as _scd2_record_updated_at,
@@ -76,9 +78,17 @@
         _valid_to_from as (
             select
                 *,
-                {{ loaded_at }} as _scd2_valid_from,
-                lead(_scd2_valid_from) over (
-                    partition by {{ entity_key }} order by _scd2_valid_from
+                _hist_last_check_cols_hash = '1' as _scd2_new_ek,
+                case
+                    when _scd2_new_ek
+                    then '{{ first_valid_from }}'::timestamp
+                    else {{ loaded_at }}
+                end as _scd2_valid_from,
+                coalesce(
+                    lead(_scd2_valid_from) over (
+                        partition by {{ entity_key }} order by _scd2_valid_from
+                    ),
+                    '{{ last_valid_to }}'::timestamp
                 ) as _scd2_valid_to
             from _union_records
         ),
@@ -89,16 +99,24 @@
 
 {% endmacro %}
 
-{% macro _scd2__full_refresh(from, unique_key, entity_key, created_at, loaded_at) %}
+{% macro _scd2__full_refresh(from, unique_key, entity_key, created_at, loaded_at, first_valid_from, last_valid_to) %}
     with
         _src as (select * from {{ from }}),
 
         _valid_to_from as (
             select
                 *,
-                {{ loaded_at }} as _scd2_valid_from,
-                lead(_scd2_valid_from) over (
-                    partition by {{ entity_key }} order by _scd2_valid_from
+                _hist_last_check_cols_hash = '1' as _scd2_new_ek,
+                case
+                    when _scd2_new_ek
+                    then '{{ first_valid_from }}'::timestamp
+                    else {{ loaded_at }}
+                end as _scd2_valid_from,
+                coalesce(
+                    lead(_scd2_valid_from) over (
+                        partition by {{ entity_key }} order by _scd2_valid_from
+                    ),
+                    '{{ last_valid_to }}'::timestamp
                 ) as _scd2_valid_to
             from _src
         ),
