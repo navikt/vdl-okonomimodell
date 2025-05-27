@@ -6,9 +6,15 @@ databases:
       - name: stages
       - name: intermediates
       - name: marts
-      - name: oebs
       - name: meta
       - name: csv
+
+  - name: okonomimodell_raw
+    transient: false
+    data_retention_time_in_days: 30
+    schemas:
+      - name: oebs
+      - name: snapshots
       
 warehouses:
   - name: okonomimodell_transformer
@@ -31,7 +37,9 @@ grants:
         - okonomimodell.intermediates
         - okonomimodell.marts
         - okonomimodell.meta
-        - okonomimodell.oebs
+        - okonomimodell_raw.snapshots
+    read_on_schemas:
+        - okonomimodell_raw.oebs
     to_users:
         - srv_okonomimodell_runner
     to_roles:

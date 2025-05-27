@@ -1,8 +1,9 @@
-{% snapshot snapshot__xxrtv_fist_gl_segment_v %}
+{% snapshot oebs__xxrtv_gl_segment_v %}
 
     {{
         config(
-          target_schema='oebs',
+          target_database='okonomimodell_raw',
+          target_schema='snapshots',
           strategy='timestamp',
           unique_key='flex_value_id',
           updated_at='last_update_date',

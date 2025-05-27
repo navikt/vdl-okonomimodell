@@ -4,12 +4,12 @@ with
         select 
             {{
                 dbt_utils.star(
-                    from=ref("snapshot__xxrtv_fist_gl_segment_v"),
+                    from=ref("oebs__xxrtv_gl_segment_v"),
                     quote_identifiers=false,
                     prefix="raw__",
                 )
             }} 
-        from {{ ref("snapshot__xxrtv_fist_gl_segment_v") }}
+        from {{ ref("oebs__xxrtv_gl_segment_v") }}
     ),
     
     ar as (
