@@ -1,8 +1,9 @@
-{% snapshot snapshot__xxrtv_gl_hierarki_v__v3 %}
+{% snapshot oebs__xxrtv_gl_hierarki_v %}
 
     {{
         config(
-            target_schema="oebs",
+            target_database="okonomimodell_raw",
+            target_schema="snapshots",
             strategy="check",
             unique_key="id",
             check_cols="all",
