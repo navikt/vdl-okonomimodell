@@ -1,11 +1,17 @@
 version: 2
 #ETRM
-sources: 
+sources:
   - name: oebs
     database: okonomimodell_raw
     schema: oebs
     tables:
       - name: xxrtv_gl_segment_v
+      - name: segment
+        description: "Historikk av daglig snapshots av tabellen xxrtv_gl_segment_v"
       - name: xxrtv_gl_hierarki_v
         identifier: xxrtv_gl_hierarki_v__v1
+      - name: hierarki
+        description: "Historikk av daglig snapshots av tabellen xxrtv_gl_hierarki_v"
       - name: xxrtv_gl_period_status_v
+      - name: period_status
+        description: "Historikk av daglig snapshots av tabellen xxrtv_gl_period_status_v"

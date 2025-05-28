@@ -1,26 +1,28 @@
 with
 
     source as (
-        select 
+        select
             {{
                 dbt_utils.star(
-                    from=ref("oebs__xxrtv_gl_segment_v"),
+                    from=ref("scd2_oebs__segment"),
                     quote_identifiers=false,
                     prefix="raw__",
                 )
-            }} 
-        from {{ ref("oebs__xxrtv_gl_segment_v") }}
+            }}
+        from {{ ref("scd2_oebs__segment") }}
     ),
-    
-    ar as (
-        select * from {{ ref("stg__ar") }}
-    ),
-    
+
+    ar as (select * from {{ ref("stg__ar") }}),
+
     per_year as (
-        select * 
-        from source 
-        join ar on raw__dbt_valid_from <= dateadd(day,-1,to_date(cast(ar.ar+1 as varchar),'yyyy'))
-        and dateadd(day,-1,to_date(cast(ar.ar+1 as varchar),'yyyy')) < coalesce(raw__dbt_valid_to,to_date('9999','yyyy'))
+        select *
+        from source
+        join
+            ar
+            on raw__gyldig_fra
+            <= dateadd(day, -1, to_date(cast(ar.ar + 1 as varchar), 'yyyy'))
+            and dateadd(day, -1, to_date(cast(ar.ar + 1 as varchar), 'yyyy'))
+            < coalesce(raw__gyldig_til, to_date('9999', 'yyyy'))
     ),
 
     derived_columnns as (
@@ -38,7 +40,7 @@ with
             raw__summary_flag = 'Y' as er_summeringsniva,
             raw__posterbar = 'Y' as er_posterbar,
             raw__enabled_flag = 'Y' as er_aktiv,
-            coalesce(raw__attribute19,'N') = 'Y' as er_budsjetterbar,
+            coalesce(raw__attribute19, 'N') = 'Y' as er_budsjetterbar,
             ar = extract(year from current_date) as er_siste_gyldige,
             cast(raw__attribute10 as varchar(200)) as attribute10,
             cast(raw__attribute11 as varchar(200)) as attribute11,
@@ -46,22 +48,14 @@ with
             cast(raw__attribute13 as varchar(200)) as attribute13,
             cast(raw__attribute14 as varchar(200)) as attribute14,
             cast(raw__attribute15 as varchar(200)) as attribute15,
-            *  exclude ar
+            * exclude ar
         from per_year
     ),
-    
+
     keyed as (
-        select 
-            {{
-                    dbt_utils.generate_surrogate_key(
-                        ["kode","ar"]
-                    )
-            }} as segment_id_per_ar,
-            {{
-                    dbt_utils.generate_surrogate_key(
-                        ["kode"]
-                    )
-            }} as segment_id,
+        select
+            {{ dbt_utils.generate_surrogate_key(["kode", "ar"]) }} as segment_id_per_ar,
+            {{ dbt_utils.generate_surrogate_key(["kode"]) }} as segment_id,
             *
         from derived_columnns
     ),

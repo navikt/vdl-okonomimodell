@@ -9,3 +9,8 @@ sources:
     schema: csv
     tables:
       - name: anskaffelse_kategorier
+  - name: oebs 
+    database: okonomimodell
+    schema: oebs 
+    tables:
+      - name: segmet_hierarki__test
