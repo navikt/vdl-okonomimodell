@@ -5,7 +5,7 @@ unit_tests:
       macros:
         is_incremental: false
     given:
-      - input: ref('test_scd2_src')
+      - input: ref('test_hist_src')
         rows:
           - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
     expect:
@@ -24,7 +24,7 @@ unit_tests:
       macros:
         is_incremental: true
     given:
-      - input: ref('test_scd2_src')
+      - input: ref('test_hist_src')
         rows:
           - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
           - { id: 1, t: "2024-01-02 00:00:00", val: "foo" }
@@ -58,7 +58,7 @@ unit_tests:
       macros:
         is_incremental: false
     given:
-      - input: ref('test_scd2_src')
+      - input: ref('test_hist_src')
         rows:
           - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
           - { id: 1, t: "2024-01-02 00:00:00", val: "foo" }
@@ -78,7 +78,7 @@ unit_tests:
       macros:
         is_incremental: true
     given:
-      - input: ref('test_scd2_src')
+      - input: ref('test_hist_src')
         rows:
           - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
           - { id: 1, t: "2024-01-02 00:00:00", val: "foo" }
@@ -105,7 +105,7 @@ unit_tests:
       macros:
         is_incremental: false
     given:
-      - input: ref('test_scd2_src')
+      - input: ref('test_hist_src')
         rows:
           - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
           - { id: 1, t: "2024-01-02 00:00:00", val: "bar" }
@@ -131,7 +131,7 @@ unit_tests:
       macros:
         is_incremental: true
     given:
-      - input: ref('test_scd2_src')
+      - input: ref('test_hist_src')
         rows:
           - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
           - { id: 1, t: "2024-01-02 00:00:00", val: "bar" }
@@ -164,7 +164,7 @@ unit_tests:
       macros:
         is_incremental: false
     given:
-      - input: ref('test_scd2_src')
+      - input: ref('test_hist_src')
         rows:
           - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
           - { id: 2, t: "2024-01-02 00:00:00", val: "bar" }
@@ -188,7 +188,7 @@ unit_tests:
       macros:
         is_incremental: true
     given:
-      - input: ref('test_scd2_src')
+      - input: ref('test_hist_src')
         rows:
           - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
           - { id: 2, t: "2024-01-02 00:00:00", val: "bar" }
@@ -225,7 +225,7 @@ unit_tests:
       macros:
         is_incremental: false
     given:
-      - input: ref('test_scd2_src')
+      - input: ref('test_hist_src')
         rows:
           - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
           - { id: 2, t: "2024-01-02 00:00:00", val: "bar" }
@@ -256,7 +256,7 @@ unit_tests:
       macros:
         is_incremental: true
     given:
-      - input: ref('test_scd2_src')
+      - input: ref('test_hist_src')
         rows:
           - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
           - { id: 1, t: "2024-02-01 00:00:00", val: "foo" }
