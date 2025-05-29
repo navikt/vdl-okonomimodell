@@ -1,28 +1,27 @@
 with
     source as (
-        select
+        select 
             {{
                 dbt_utils.star(
-                    from=ref("scd2_oebs__hierarki"),
+                    from=ref("oebs__xxrtv_gl_hierarki_v"),
                     quote_identifiers=false,
                     prefix="raw__",
                 )
             }}
-        from {{ ref("scd2_oebs__hierarki") }}
+        from {{ ref("oebs__xxrtv_gl_hierarki_v") }}
     ),
 
-    ar as (select * from {{ ref("stg__ar") }}),
+    ar as (
+        select * from {{ ref("stg__ar") }}
+    ),
 
     per_year as (
-        select *
-        from source
-        join
-            ar
-            on raw__gyldig_fra
-            <= dateadd(day, -1, to_date(cast(ar.ar + 1 as varchar), 'yyyy'))
-            and dateadd(day, -1, to_date(cast(ar.ar + 1 as varchar), 'yyyy'))
-            < coalesce(raw__gyldig_til, to_date('9999', 'yyyy'))
+        select * 
+        from source 
+        join ar on raw__dbt_valid_from <= dateadd(day,-1,to_date(cast(ar.ar+1 as varchar),'yyyy'))
+        and dateadd(day,-1,to_date(cast(ar.ar+1 as varchar),'yyyy')) < coalesce(raw__dbt_valid_to,to_date('9999','yyyy'))
     ),
+
 
     derived_columnns as (
         select
@@ -40,9 +39,17 @@ with
         from per_year
     ),
     keyed as (
-        select
-            {{ dbt_utils.generate_surrogate_key(["kode"]) }} as segment_id,
-            {{ dbt_utils.generate_surrogate_key(["kode", "ar"]) }} as segment_id_per_ar,
+        select 
+            {{
+                    dbt_utils.generate_surrogate_key(
+                        ["kode"]
+                    )
+            }} as segment_id,
+            {{
+                    dbt_utils.generate_surrogate_key(
+                        ["kode","ar"]
+                    )
+            }} as segment_id_per_ar,
             *,
             ar = extract(year from current_date) as er_siste_gyldige
         from derived_columnns
