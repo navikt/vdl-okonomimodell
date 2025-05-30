@@ -2,7 +2,7 @@
     {{
         config(
             materialized="incremental",
-            entity_key="_hist_record_hash",
+            unique_key="_hist_record_hash",
             on_schema_change="fail",
         )
     }}
