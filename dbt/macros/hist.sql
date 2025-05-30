@@ -29,6 +29,7 @@
                 {{ dbt_utils.generate_surrogate_key(check_cols) }}
                 as _hist_check_cols_hash,
                 {{ loaded_at }} as _hist_loaded_at,
+                current_timestamp as _hist_record_created_at,
             from src
         ),
 
@@ -61,11 +62,13 @@
                     _hist_input__entity_key,
                     _hist_input__check_cols,
                     _hist_input__loaded_at,
-                    _hist_record_created_at
+                    _hist_record_created_at,
+                    _hist_record_updated_at
                 ),
                 _hist_entity_key_hash,
                 _hist_check_cols_hash,
-                _hist_loaded_at
+                _hist_loaded_at,
+                _hist_record_created_at
             from last_records
         ),
 
@@ -159,7 +162,7 @@
                 {{ entity_key }} as _hist_input__entity_key,
                 {{ check_cols }} as _hist_input__check_cols,
                 '{{ loaded_at }}' as _hist_input__loaded_at,
-                current_timestamp as _hist_record_created_at,
+                current_timestamp as _hist_record_updated_at
             from changed_records
         ),
 
@@ -285,6 +288,7 @@
 
         record_timestamps as (
             select meta_columns.*, current_timestamp as _hist_record_created_at,
+                current_timestamp as _hist_record_updated_at
             from meta_columns
         ),
 

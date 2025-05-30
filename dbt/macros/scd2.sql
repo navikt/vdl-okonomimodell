@@ -2,7 +2,7 @@
     from,
     unique_key="_hist_record_hash",
     entity_key="_hist_entity_key_hash",
-    created_at="_hist_record_created_at",
+    updated_at="_hist_record_updated_at",
     loaded_at="_hist_loaded_at",
     first_valid_from="1900-01-01 00:00:00",
     last_valid_to="9999-01-01 23:59:59"
@@ -19,13 +19,13 @@
             {% if is_incremental() %}
                 {{
                     _scd2__incremental(
-                        from, unique_key, entity_key, created_at, loaded_at, first_valid_from, last_valid_to
+                        from, unique_key, entity_key, updated_at, loaded_at, first_valid_from, last_valid_to
                     )
                 }}
             {% else %}
                 {{
                     _scd2__full_refresh(
-                        from, unique_key, entity_key, created_at, loaded_at, first_valid_from, last_valid_to
+                        from, unique_key, entity_key, updated_at, loaded_at, first_valid_from, last_valid_to
                     )
                 }}
             {% endif %}
@@ -50,12 +50,12 @@
 
 {% endmacro %}
 
-{% macro _scd2__incremental(from, unique_key, entity_key, created_at, loaded_at, first_valid_from, last_valid_to) %}
+{% macro _scd2__incremental(from, unique_key, entity_key, updated_at, loaded_at, first_valid_from, last_valid_to) %}
     with
         _src as (
             select *, current_timestamp as _scd2_record_updated_at,
             from {{ from }}
-            where {{ created_at }} > (select max({{ created_at }}) from {{ this }})
+            where {{ updated_at }} > (select max({{ updated_at }}) from {{ this }})
         ),
 
         _last_valid_records as (
@@ -99,7 +99,7 @@
 
 {% endmacro %}
 
-{% macro _scd2__full_refresh(from, unique_key, entity_key, created_at, loaded_at, first_valid_from, last_valid_to) %}
+{% macro _scd2__full_refresh(from, unique_key, entity_key, updated_at, loaded_at, first_valid_from, last_valid_to) %}
     with
         _src as (select * from {{ from }}),
 
