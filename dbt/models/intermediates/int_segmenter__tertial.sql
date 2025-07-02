@@ -49,15 +49,27 @@ with
                 "'0_intern_art'"[0][1] as varchar(2000)
             ) as artskonto_totalniva_beskrivelse,
             -- Kostnadssted: grunn nivå
-            cast("'5_intern_ksted'"[0][0] as varchar(200)) as kostnadsstedsniva_5,
-            cast(
-                "'5_intern_ksted'"[0][1] as varchar(2000)
-            ) as kostnadsstedsniva_5_beskrivelse,
+            case when cast("'3_intern_ksted'"[0][0] as varchar(200)) = kode then
+                cast("'3_intern_ksted'"[0][0] as varchar(200))||'_PROGNOSE_NIVA_4'
+            else 
+                cast("'5_intern_ksted'"[0][0] as varchar(200)) 
+            end as kostnadsstedsniva_5,
+            case when cast("'3_intern_ksted'"[0][0] as varchar(200)) = kode then
+                'Prognose -'||cast("'3_intern_ksted'"[0][1] as varchar(2000))
+            else 
+                cast("'5_intern_ksted'"[0][1] as varchar(2000)) 
+            end as kostnadsstedsniva_5_beskrivelse,
             -- Kostandssted: foreldre
-            cast("'4_intern_ksted'"[0][0] as varchar(200)) as kostnadsstedsniva_4,
-            cast(
-                "'4_intern_ksted'"[0][1] as varchar(2000)
-            ) as kostnadsstedsniva_4_beskrivelse,
+            case when cast("'3_intern_ksted'"[0][0] as varchar(200)) = kode then
+                cast("'3_intern_ksted'"[0][0] as varchar(200))||'_PROGNOSE_NIVA_5'
+            else 
+                cast("'4_intern_ksted'"[0][0] as varchar(200)) 
+            end as kostnadsstedsniva_4,
+            case when cast("'3_intern_ksted'"[0][0] as varchar(200)) = kode then
+                'Prognose -'||cast("'3_intern_ksted'"[0][1] as varchar(2000))
+            else 
+                cast("'4_intern_ksted'"[0][1] as varchar(2000)) 
+            end as kostnadsstedsniva_4_beskrivelse,
             cast("'3_intern_ksted'"[0][0] as varchar(200)) as kostnadsstedsniva_3,
             cast(
                 "'3_intern_ksted'"[0][1] as varchar(2000)
