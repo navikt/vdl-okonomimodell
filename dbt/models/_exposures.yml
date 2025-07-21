@@ -24,41 +24,46 @@ exposures:
     description: >
       dbt prosjekt som eksponerer okonomimodellen videre til MSTR
     depends_on:
-      - ref("dim_ansvarssteder")
       - ref("dim_artskonti")
-      - ref("dim_felles")
+      - ref("dim_statsregnskapskonti")
+      - ref("dim_aktiviteter")
+      - ref("dim_produkter")
+      - ref("dim_kostnadssteder_per_ar")
+      - ref("dim_kostnadssteder_per_ar_tertial")
+      - ref("dim_regnskapsforere")
+      - ref("dim_oppgaver")
+      - ref("dim_ansvarssteder")
+      - ref("dim_tilsagnsar")
+      - ref("dim_kilder")
+      - ref("dim_fullmakter")
       - ref("dim_fritt_felt_1")
       - ref("dim_fritt_felt_2")
-      - ref("dim_kilder")
-      - ref("dim_kostnadssteder")
-      - ref("dim_kostnadssteder_per_ar")
-      - ref("dim_oppgaver")
-      - ref("dim_produkter")
-      - ref("dim_regnskapsforere")
-      - ref("dim_statsregnskapskonti")
-      - ref("dim_tilsagnsar")
-      - ref("dim_kostnadssteder_per_ar_tertial")
-      - ref("dim_kostnadssteder__kill_me")
-      - ref("dim_fullmakter")
-      - ref("dim_aktiviteter")
       - ref("dim_formalskoder")
+      - ref("dim_kostnadssteder__kill_me")
+      - ref("dim_felles")
     owner:
       name: "Virksomhetsdatalaget"
 
-  - name: vdl_regnskap
+  - name: vdl_regnskapsdata
     type: application
     maturity: high
-    url: https://github.com/navikt/vdl-regnskap
+    url: https://github.com/navikt/vdl-regnskapsdata
     description: >
       dbt prosjekt for regnskapsdata
     depends_on:
-      # TODO
+      - ref("dim_fritt_felt_2")
+      - ref("dim_oppgaver")
+      - ref("dim_regnskapsforere")
       - ref("dim_artskonti")
       - ref("dim_kostnadssteder")
-      - ref("dim_produkter")
-      - ref("dim_oppgaver")
-      - ref("dim_felles")
+      - ref("dim_fullmakter")
+      - ref("dim_kilder")
+      - ref("dim_formalskoder")
+      - ref("dim_tilsagnsar")
       - ref("dim_statsregnskapskonti")
+      - ref("dim_kostnadssteder_per_ar_tertial")
+      - ref("dim_produkter")
+      - ref("dim_felles")
     owner:
       name: "Virksomhetsdatalaget"
 
@@ -70,12 +75,18 @@ exposures:
       dbt prosjekt for fakturadata
     depends_on:
       # TODO
-      - ref("dim_artskonti")
-      - ref("dim_kostnadssteder")
-      - ref("dim_produkter")
-      - ref("dim_oppgaver")
       - ref("dim_felles")
+      - ref("dim_aktiviteter")
       - ref("dim_statsregnskapskonti")
+      - ref("dim_artskonti")
+      - ref("dim_ansvarssteder")
+      - ref("dim_kostnadssteder")
+      - ref("dim_kostnadssteder_per_ar_tertial")
+      - ref("dim_formalskoder")
+      - ref("dim_oppgaver")
+      - ref("dim_kilder")
+      - ref("dim_produkter")
+      - ref("dim_fullmakter")
     owner:
       name: "Virksomhetsdatalaget"
 
@@ -86,10 +97,33 @@ exposures:
     description: >
       dbt prosjekt for eiendomsdata
     depends_on:
-      # TODO
       - ref("dim_felles")
       - ref("dim_artskonti")
       - ref("dim_kostnadssteder")
+      - ref("dim_produkter")
+    owner:
+      name: "Virksomhetsdatalaget"
+
+  - name: vdl_innkjop
+    type: application
+    maturity: low
+    url: https://github.com/navikt/vdl-innkjop
+    description: >
+      dbt prosjekt for innkjøpsdata
+    depends_on:
+      - ref("dim_statsregnskapskonti")
+      - ref("dim_fullmakter")
+      - ref("dim_kostnadssteder")
+      - ref("dim_tilsagnsar")
+      - ref("dim_kilder")
+      - ref("dim_regnskapsforere")
+      - ref("dim_ansvarssteder")
+      - ref("dim_formalskoder")
+      - ref("dim_artskonti")
+      - ref("dim_aktiviteter")
+      - ref("dim_oppgaver")
+      - ref("dim_artskonti_per_ar_tertial")
+      - ref("dim_felles")
       - ref("dim_produkter")
     owner:
       name: "Virksomhetsdatalaget"
