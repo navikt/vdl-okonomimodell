@@ -1,6 +1,6 @@
 {{
     hist(
-        from=source("oebs", "hierarki"),
+        from=ref('test_hierarki_src'),
         entity_key=["hierarchy_code", "flex_value_id"],
         check_cols=[
             "flex_value",

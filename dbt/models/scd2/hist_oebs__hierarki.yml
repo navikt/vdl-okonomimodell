@@ -1,0 +1,7 @@
+models:
+  - name: hist_oebs__hierarki
+    columns:
+      - name: _hist_record_hash
+        tests:
+          - unique
+          - not_null

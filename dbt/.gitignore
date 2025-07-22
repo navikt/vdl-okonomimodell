@@ -4,3 +4,4 @@ dbt_modules/
 logs/
 edr_target/
 dbt_packages/
+dbt_internal_packages/

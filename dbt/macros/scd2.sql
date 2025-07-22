@@ -53,7 +53,7 @@
 {% macro _scd2__incremental(from, unique_key, entity_key, updated_at, loaded_at, first_valid_from, last_valid_to) %}
     with
         _src as (
-            select *, current_timestamp as _scd2_record_updated_at,
+            select {{ dbt_utils.star(from=from, quote_identifiers=false) }}, current_timestamp as _scd2_record_updated_at,
             from {{ from }}
             where {{ updated_at }} > (select max({{ updated_at }}) from {{ this }})
         ),
