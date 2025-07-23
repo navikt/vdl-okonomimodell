@@ -207,7 +207,7 @@ unit_tests:
               _hist_record_hash: "ac9ccbd6325d29f956d5b9090c23f1de",
               _hist_last_entity_key_is_deleted: false,
               _hist_entity_key_is_deleted: false,
-              _hist_record_updated_at: "2024-01-01 01:00:00"
+              _hist_record_updated_at: "2024-01-01 01:00:00",
             }
     expect:
       rows:
@@ -232,7 +232,7 @@ unit_tests:
       - input: ref('test_hist_src')
         rows:
           - { id: 1, t: "2024-01-01 00:00:00", val: "foo" }
-          - { id: 2, t: "2024-01-02 00:00:00", val: "bar" }
+          - { id: 2, t: "2024-01-02 00:00:00", val: "foo" }
       - input: this
         rows:
           - {
@@ -250,18 +250,17 @@ unit_tests:
           - {
               id: 2,
               t: "2024-01-02 00:00:00",
-              val: "bar",
+              val: "foo",
               _hist_loaded_at: "2024-01-02 00:00:00",
               _hist_entity_key_hash: "c81e728d9d4c2f636f067f89cc14862c",
               _hist_check_cols_hash: "acbd18db4cc2f85cedef654fccc4a4d8",
-              _hist_record_hash: "3ed3afbf172f8b221eee8c8792fcd70a",
+              _hist_record_hash: "c09edbaa7dea590bdacb2732bd9fa1c9",
               _hist_last_entity_key_is_deleted: false,
               _hist_entity_key_is_deleted: false,
               _hist_record_updated_at: "2024-01-02 01:00:00",
             }
     expect:
       rows: []
-
 
   - name: test_hist_new_record_when_last_entity_key_was_deleted__full_refresh
     description: "Test that new record is inserted when last entity key was deleted"
