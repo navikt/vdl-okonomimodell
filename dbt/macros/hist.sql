@@ -36,6 +36,7 @@
         last_records as (
             select *
             from {{ this }} as this
+            where not _hist_entity_key_is_deleted
             qualify
                 max(_hist_loaded_at) over (partition by _hist_entity_key_hash)
                 = this._hist_loaded_at
@@ -287,7 +288,9 @@
         ),
 
         record_timestamps as (
-            select meta_columns.*, current_timestamp as _hist_record_created_at,
+            select
+                meta_columns.*,
+                current_timestamp as _hist_record_created_at,
                 current_timestamp as _hist_record_updated_at
             from meta_columns
         ),
