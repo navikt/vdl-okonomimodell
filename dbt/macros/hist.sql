@@ -36,14 +36,13 @@
         last_records as (
             select *
             from {{ this }} as this
-            where not _hist_entity_key_is_deleted
             qualify
                 max(_hist_loaded_at) over (partition by _hist_entity_key_hash)
                 = this._hist_loaded_at
         ),
 
         union_records as (
-            select *
+            select *, null as _hist_old_record_was_deleted
             from src_hash
             union all
             select
@@ -69,7 +68,8 @@
                 _hist_entity_key_hash,
                 _hist_check_cols_hash,
                 _hist_loaded_at,
-                _hist_record_created_at
+                _hist_record_created_at,
+                _hist_entity_key_is_deleted as _hist_old_record_was_deleted
             from last_records
         ),
 
@@ -102,9 +102,11 @@
 
         deletes as (
             select
-                entity_key_load_times.*,
+                entity_key_load_times.* exclude(_hist_old_record_was_deleted),
                 load_times._hist_next_loaded_at,
                 case
+                    when entity_key_load_times._hist_old_record_was_deleted
+                    then true
                     when
                         entity_key_load_times._hist_entity_key_next_load_time
                         != load_times._hist_next_loaded_at
