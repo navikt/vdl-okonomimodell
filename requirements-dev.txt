@@ -2,6 +2,6 @@ pytest
 black
 isort
 shandy-sqlfmt[jinjafmt]
-snowbird @ git+https://github.com/navikt/snowbird
+snowbird @ git+https://github.com/navikt/snowbird@v0.5
 ipdb
 snowflake-cli-labs

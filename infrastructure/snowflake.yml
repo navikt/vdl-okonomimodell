@@ -1,3 +1,5 @@
+id: okonomimodell
+
 databases:
   - name: okonomimodell
     transient: false
@@ -15,20 +17,16 @@ databases:
     schemas:
       - name: oebs
       - name: snapshots
-      
+
 warehouses:
   - name: okonomimodell_transformer
 
-users:
-  - name: srv_okonomimodell_runner
-    type: legacy_service
-      
 roles:
   - name: okonomimodell_transformer
   - name: okonomimodell_reporter
-      
+
 grants:
-  - role: okonomimodell_transformer   
+  - role: okonomimodell_transformer
     warehouses:
         - okonomimodell_transformer
     write_on_schemas:
@@ -55,8 +53,3 @@ grants:
         - regnskap_transformer
         - reporting_airflow
         - reporting_transformer
-
-
-
-
-
