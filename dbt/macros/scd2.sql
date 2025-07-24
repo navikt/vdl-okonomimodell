@@ -53,7 +53,9 @@
 {% macro _scd2__incremental(from, unique_key, entity_key, updated_at, loaded_at, first_valid_from, last_valid_to) %}
     with
         _src as (
-            select {{ dbt_utils.star(from=from, quote_identifiers=false) }}, current_timestamp as _scd2_record_updated_at,
+            select
+                {{ dbt_utils.star(from=from, quote_identifiers=false) }},
+                current_timestamp as _scd2_record_updated_at,
             from {{ from }}
             where {{ updated_at }} > (select max({{ updated_at }}) from {{ this }})
         ),
@@ -79,11 +81,7 @@
             select
                 *,
                 _hist_last_check_cols_hash = '1' as _scd2_new_ek,
-                case
-                    when _scd2_new_ek
-                    then '{{ first_valid_from }}'::timestamp
-                    else {{ loaded_at }}
-                end as _scd2_valid_from,
+                {{ loaded_at }} as _scd2_valid_from,
                 coalesce(
                     lead(_scd2_valid_from) over (
                         partition by {{ entity_key }} order by _scd2_valid_from
@@ -101,14 +99,20 @@
 
 {% macro _scd2__full_refresh(from, unique_key, entity_key, updated_at, loaded_at, first_valid_from, last_valid_to) %}
     with
-        _src as (select * from {{ from }}),
+        _src as (
+            select
+                *,
+                min({{ loaded_at }}) over (partition by 1)
+                = {{ loaded_at }} as _first_loaded
+            from {{ from }}
+        ),
 
         _valid_to_from as (
             select
-                *,
+                * exclude _first_loaded,
                 _hist_last_check_cols_hash = '1' as _scd2_new_ek,
                 case
-                    when _scd2_new_ek
+                    when _first_loaded
                     then '{{ first_valid_from }}'::timestamp
                     else {{ loaded_at }}
                 end as _scd2_valid_from,
