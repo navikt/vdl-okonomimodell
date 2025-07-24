@@ -45,9 +45,6 @@
             "attribute29",
             "attribute30",
             "gruppe",
-            "created_by",
-            "creation_date",
-            "last_updated_by",
         ],
         loaded_at="_loaded_at",
     )
