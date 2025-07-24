@@ -4,12 +4,12 @@ with
         select
             {{
                 dbt_utils.star(
-                    from=ref("oebs__xxrtv_gl_segment_v"),
+                    from=ref("scd2_oebs__segment"),
                     quote_identifiers=false,
                     prefix="raw__",
                 )
             }}
-        from {{ ref("oebs__xxrtv_gl_segment_v") }}
+        from {{ ref("scd2_oebs__segment") }}
     ),
 
     tertial as (select * from {{ ref("stg__tertial") }}),
@@ -19,8 +19,8 @@ with
         from source
         join
             tertial
-            on raw__dbt_valid_from <= tertial.til_dato
-            and tertial.til_dato < coalesce(raw__dbt_valid_to, to_date('9999', 'yyyy'))
+            on raw__gyldig_fra <= tertial.til_dato
+            and tertial.til_dato < coalesce(raw__gyldig_til, to_date('9999', 'yyyy'))
     ),
 
     derived_columnns as (

@@ -28,9 +28,11 @@
         "editor.formatOnSave": true
     },
     "[yaml]": {
-        "editor.defaultFormatter": "redhat.vscode-yaml"
+        "editor.defaultFormatter": "redhat.vscode-yaml",
+        "editor.formatOnSave": true
     },
     "dbt.enableNewLineagePanel": true,
     "editor.trimAutoWhitespace": true,
     "diffEditor.ignoreTrimWhitespace": false,
+    "dbt.perspectiveTheme": "Vintage",
 }

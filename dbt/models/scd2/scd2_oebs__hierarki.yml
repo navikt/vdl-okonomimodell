@@ -1,0 +1,7 @@
+models:
+  - name: scd2_oebs__hierarki
+    columns:
+      - name: pk_scd2_oebs__hierarki
+        tests:
+          - unique
+          - not_null
