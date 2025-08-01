@@ -1,7 +1,7 @@
 models:
-  - name: scd2_oebs__segment
+  - name: stg_oebs__segment_hierarkier__tertial
     columns:
-      - name: pk_scd2_oebs__segment
+      - name: _uid
         tests:
           - unique:
               config:
@@ -9,9 +9,6 @@ models:
           - not_null:
               config:
                 severity: error
-      - name: ek_scd2_oebs__segment
-        tests:
-          - unique:
-              where: gyldig_til > current_timestamp
+          - dbt_utils.at_least_one:
               config:
                 severity: error

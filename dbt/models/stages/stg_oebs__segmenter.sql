@@ -54,6 +54,8 @@ with
 
     keyed as (
         select
+            {{ dbt_utils.generate_surrogate_key(["kode", "ar", "segment_type"]) }}
+            as _uid,
             {{ dbt_utils.generate_surrogate_key(["kode", "ar"]) }} as segment_id_per_ar,
             {{ dbt_utils.generate_surrogate_key(["kode"]) }} as segment_id,
             *
