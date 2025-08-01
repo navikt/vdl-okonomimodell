@@ -1,0 +1,14 @@
+models:
+  - name: stg__ar
+    columns:
+      - name: ar
+        tests:
+          - unique:
+              config:
+                severity: error
+          - not_null:
+              config:
+                severity: error
+          - dbt_utils.at_least_one:
+              config:
+                severity: error
