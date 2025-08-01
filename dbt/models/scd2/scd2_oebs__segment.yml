@@ -3,5 +3,15 @@ models:
     columns:
       - name: pk_scd2_oebs__segment
         tests:
-          - unique
-          - not_null
+          - unique:
+              config:
+                severity: error
+          - not_null:
+              config:
+                severity: error
+      - name: ek_scd2_oebs__segment
+        tests:
+          - unique:
+              where: gyldig_til > current_timestamp
+              config:
+                severity: error

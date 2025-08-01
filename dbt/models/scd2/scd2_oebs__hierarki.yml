@@ -5,3 +5,9 @@ models:
         tests:
           - unique
           - not_null
+      - name: ek_scd2_oebs__hierarki
+        tests:
+          - unique:
+              where: gyldig_til > current_timestamp
+              config:
+                severity: error
