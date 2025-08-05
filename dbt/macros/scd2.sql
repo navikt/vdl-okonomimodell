@@ -5,6 +5,7 @@
     updated_at="_hist_record_updated_at",
     loaded_at="_hist_loaded_at",
     deleted_at="_hist_entity_key_deleted_at",
+    created_at="_hist_record_created_at",
     first_valid_from="1900-01-01 00:00:00",
     last_valid_to="9999-01-01 23:59:59"
 ) %}
@@ -34,11 +35,11 @@
 
         _scd2_rename_cols as (
             select
-                _hist_record_hash as pk_{{ this.name }},
-                _hist_entity_key_hash as ek_{{ this.name }},
-                _hist_loaded_at as lastet_tidspunkt,
-                _scd2_record_updated_at as oppdatert_tidspunkt,
-                _hist_record_created_at as opprettet_tidspunkt,
+                {{ unique_key }} as pk_{{ this.name }},
+                {{ entity_key }} as ek_{{ this.name }},
+                {{ loaded_at }} as lastet_tidspunkt,
+                {{ updated_at }} as oppdatert_tidspunkt,
+                {{ created_at }} as opprettet_tidspunkt,
                 _scd2_valid_from as gyldig_fra,
                 _scd2_valid_to as gyldig_til,
                 *,
