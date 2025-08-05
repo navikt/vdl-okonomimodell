@@ -38,7 +38,7 @@
                 {{ unique_key }} as pk_{{ this.name }},
                 {{ entity_key }} as ek_{{ this.name }},
                 {{ loaded_at }} as lastet_tidspunkt,
-                {{ updated_at }} as oppdatert_tidspunkt,
+                _scd2_record_updated_at as oppdatert_tidspunkt,
                 {{ created_at }} as opprettet_tidspunkt,
                 _scd2_valid_from as gyldig_fra,
                 _scd2_valid_to as gyldig_til,
