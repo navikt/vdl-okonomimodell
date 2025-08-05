@@ -81,7 +81,6 @@
         _valid_to_from as (
             select
                 *,
-                _hist_last_check_cols_hash = '1' as _scd2_new_ek,
                 {{ loaded_at }} as _scd2_valid_from,
                 coalesce(
                     {{ deleted_at }},
@@ -112,7 +111,6 @@
         _valid_to_from as (
             select
                 * exclude _first_loaded,
-                _hist_last_check_cols_hash = '1' as _scd2_new_ek,
                 case
                     when _first_loaded
                     then '{{ first_valid_from }}'::timestamp

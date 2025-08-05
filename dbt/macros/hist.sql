@@ -57,6 +57,7 @@
                     _hist_last_check_cols_hash,
                     _hist_last_entity_key_is_deleted,
                     _hist_record_has_change,
+                    _hist_new_ek,
                     _hist_record_hash,
                     _hist_input__from,
                     _hist_input__entity_key,
@@ -159,6 +160,7 @@
         meta_columns as (
             select
                 *,
+                _hist_last_check_cols_hash = '1' as _hist_new_ek,
                 {{ dbt_utils.generate_surrogate_key(entity_key + ["_hist_loaded_at"]) }}
                 as _hist_record_hash,
                 '{{ from }}' as _hist_input__from,
@@ -280,6 +282,7 @@
         meta_columns as (
             select
                 changed_records.*,
+                _hist_last_check_cols_hash = '1' as _hist_new_ek,
                 {{ dbt_utils.generate_surrogate_key(entity_key + [loaded_at]) }}
                 as _hist_record_hash,
                 '{{ from }}' as _hist_input__from,
