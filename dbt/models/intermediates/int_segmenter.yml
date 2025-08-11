@@ -2,7 +2,7 @@ models:
   - name: int_segmenter
     columns:
       - name: _uid
-        tests:
+        data_tests:
           - unique:
               config:
                 severity: error
@@ -11,4 +11,254 @@ models:
                 severity: error
           - dbt_utils.at_least_one:
               config:
+                severity: error
+      - name: artskonto
+        data_tests:
+          - segment_length:
+              length: 12
+              segment_type: "OR_ART"
+              config:
+                where: "length(kode) != 4"
+                severity: error
+          - segment_length:
+              length: 20
+              segment_type: "OR_ART"
+              config:
+                where: "length(kode) = 4"
+                severity: error
+      - name: konto_tre_siffer
+        data_tests:
+          - segment_length:
+              length: 6
+              segment_type: "OR_ART"
+              config:
+                where: "length(kode) != 4"
+                severity: error
+          - segment_length:
+              length: 20
+              segment_type: "OR_ART"
+              config:
+                where: "length(kode) = 4"
+                severity: error
+      - name: budsjett_niva
+        data_tests:
+          - segment_length:
+              length: 4
+              segment_type: "OR_ART"
+              config:
+                severity: error
+      - name: kontogruppe
+        data_tests:
+          - segment_length:
+              length: 2
+              segment_type: "OR_ART"
+              config:
+                severity: error
+      - name: kontoklasse
+        data_tests:
+          - segment_length:
+              length: 1
+              segment_type: "OR_ART"
+              config:
+                severity: error
+      - name: kostnadsstedsniva_1
+        data_tests:
+          - segment_length:
+              length: 1
+              segment_type: "OR_KSTED"
+              config:
+                severity: error
+      - name: kostnadsstedsniva_2
+        data_tests:
+          - segment_length:
+              length: 2
+              segment_type: "OR_KSTED"
+              config:
+                severity: error
+      - name: kostnadsstedsniva_3
+        data_tests:
+          - segment_length:
+              length: 3
+              segment_type: "OR_KSTED"
+              config:
+                severity: error
+      - name: kostnadsstedsniva_4
+        data_tests:
+          - segment_length:
+              length: 5
+              segment_type: "OR_KSTED"
+              config:
+                severity: error
+      - name: kostnadsstedsniva_5
+        data_tests:
+          - segment_length:
+              length: 6
+              segment_type: "OR_KSTED"
+              config:
+                severity: error
+      - name: oppgaveniva_1
+        data_tests:
+          - segment_length:
+              length: 1
+              segment_type: "OR_AKTIVITET"
+              config:
+                severity: error
+      - name: oppgaveniva_2
+        data_tests:
+          - segment_length:
+              length: 4
+              segment_type: "OR_AKTIVITET"
+              config:
+                severity: error
+      - name: oppgaveniva_3
+        data_tests:
+          - segment_length:
+              length: 5
+              segment_type: "OR_AKTIVITET"
+              config:
+                severity: error
+      - name: oppgave
+        data_tests:
+          - segment_length:
+              length: 6
+              segment_type: "OR_AKTIVITET"
+              config:
+                severity: error
+      - name: produkttype
+        data_tests:
+          - segment_length:
+              length: 1
+              segment_type: "OR_FORMAL"
+              config:
+                severity: error
+      - name: produktkategori
+        data_tests:
+          - segment_length:
+              length: 1
+              segment_type: "OR_FORMAL"
+              config:
+                where: "produkttype != '9'"
+                severity: error
+          - segment_length:
+              length: 2
+              segment_type: "OR_FORMAL"
+              config:
+                where: "produkttype = '9'"
+                severity: error
+      - name: produktgruppe
+        data_tests:
+          - segment_length:
+              length: 2
+              segment_type: "OR_FORMAL"
+              config:
+                where: "produkttype != '9'"
+                severity: error
+          - segment_length:
+              length: 3
+              segment_type: "OR_FORMAL"
+              config:
+                where: "produkttype = '9'"
+                severity: error
+      - name: produkt
+        data_tests:
+          - segment_length:
+              length: 6
+              segment_type: "OR_FORMAL"
+              config:
+                severity: error
+      - name: statsregnskapskonto
+        data_tests:
+          - segment_length:
+              length: 12
+              segment_type: "OR_STATSKONTO"
+              config:
+                where: "post != kode"
+                severity: error
+          - segment_length:
+              length: 22
+              segment_type: "OR_STATSKONTO"
+              config:
+                where: "post = kode and kapittel != '6004'"
+                severity: error
+          - segment_length:
+              length: 24
+              segment_type: "OR_STATSKONTO"
+              config:
+                where: "post = kode and kapittel = '6004'"
+                severity: error
+      - name: post
+        data_tests:
+          - segment_length:
+              length: 6
+              segment_type: "OR_STATSKONTO"
+              config:
+                where: "kapittel != '6004'"
+                severity: error
+          - segment_length:
+              length: 8
+              segment_type: "OR_STATSKONTO"
+              config:
+                where: "kapittel = '6004'"
+                severity: error
+      - name: kapittel
+        data_tests:
+          - segment_length:
+              length: 4
+              segment_type: "OR_STATSKONTO"
+              config:
+                severity: error
+      - name: statsregnskapskonto_totalniva
+        data_tests:
+          - accepted_values:
+              values:
+                - "T"
+              config:
+                severity: error
+          - not_null:
+              config:
+                where: "statsregnskapskonto is not null"
+                severity: error
+      - name: artskonto_totalniva
+        data_tests:
+          - accepted_values:
+              values:
+                - "T"
+              config:
+                severity: error
+          - not_null:
+              config:
+                where: "artskonto is not null"
+                severity: error
+      - name: kostnadssted_totalniva
+        data_tests:
+          - accepted_values:
+              values:
+                - "T"
+              config:
+                severity: error
+          - not_null:
+              config:
+                where: "kostnadsstedsniva_5 is not null"
+                severity: error
+      - name: oppgaveniva_1
+        data_tests:
+          - accepted_values:
+              values:
+                - "T"
+              config:
+                severity: error
+          - not_null:
+              config:
+                where: "oppgave is not null"
+                severity: error
+      - name: produkt_totalniva
+        data_tests:
+          - accepted_values:
+              values:
+                - "T"
+              config:
+                severity: error
+          - not_null:
+              config:
+                where: "produkt is not null"
                 severity: error

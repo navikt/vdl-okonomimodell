@@ -8,3 +8,5 @@ partial_parse.msgpack
 .venv
 seeds/
 diff_*.xlsx
+.DS_Store
+test.py
