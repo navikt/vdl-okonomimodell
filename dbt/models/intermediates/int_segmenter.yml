@@ -18,13 +18,13 @@ models:
               length: 12
               segment_type: "OR_ART"
               config:
-                where: "length(kode) != 4"
+                where: "kode != budsjett_niva"
                 severity: error
           - segment_length:
               length: 20
               segment_type: "OR_ART"
               config:
-                where: "length(kode) = 4"
+                where: "kode = budsjett_niva"
                 severity: error
       - name: konto_tre_siffer
         data_tests:
@@ -32,13 +32,13 @@ models:
               length: 6
               segment_type: "OR_ART"
               config:
-                where: "length(kode) != 4"
+                where: "kode != budsjett_niva"
                 severity: error
           - segment_length:
               length: 20
               segment_type: "OR_ART"
               config:
-                where: "length(kode) = 4"
+                where: "kode = budsjett_niva"
                 severity: error
       - name: budsjett_niva
         data_tests:
