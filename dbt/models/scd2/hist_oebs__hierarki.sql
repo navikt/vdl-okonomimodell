@@ -1,5 +1,5 @@
 {{
-    hist(
+    vdl_macros.hist(
         from=source("oebs", "hierarki"),
         entity_key=["hierarchy_code", "flex_value_id"],
         check_cols=[

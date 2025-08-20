@@ -1,1 +1,1 @@
-{{ scd2(from=ref("hist_oebs__hierarki")) }}
+{{ vdl_macros.scd2(from=ref("hist_oebs__hierarki")) }}

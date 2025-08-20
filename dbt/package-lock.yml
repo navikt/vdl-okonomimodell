@@ -5,4 +5,6 @@ packages:
     version: 0.12.1
   - package: elementary-data/elementary
     version: 0.16.0
-sha1_hash: 1a2de40d5a715eb317306b02ba5bd9cae3b8a1d9
+  - git: https://github.com/navikt/vdl-macros.git
+    revision: 154aadba8f1c967f79770467d7c91b9c812564ef
+sha1_hash: eeb1dd7c3cf99e39d49556b01d93c3427465d3a4

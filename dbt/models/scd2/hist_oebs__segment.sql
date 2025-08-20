@@ -1,5 +1,5 @@
 {{
-    hist(
+    vdl_macros.hist(
         from=source("oebs", "segment"),
         entity_key=[
             "flex_value_id",
