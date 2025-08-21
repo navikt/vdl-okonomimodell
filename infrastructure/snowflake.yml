@@ -38,8 +38,6 @@ grants:
         - okonomimodell_raw.snapshots
     read_on_schemas:
         - okonomimodell_raw.oebs
-    to_users:
-        - srv_okonomimodell_runner
     to_roles:
         - airflow_orchestrator
   - role: okonomimodell_reporter
