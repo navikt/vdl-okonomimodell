@@ -18,8 +18,8 @@ with
         from source
         join
             tertial
-            on raw__gyldig_fra <= tertial.til_dato
-            and tertial.til_dato < coalesce(raw__gyldig_til, to_date('9999', 'yyyy'))
+            on raw__gyldig_fra < tertial.til_dato
+            and tertial.til_dato <= coalesce(raw__gyldig_til, to_date('9999', 'yyyy'))
     ),
 
     derived_columnns as (
@@ -48,7 +48,7 @@ with
             {{ dbt_utils.generate_surrogate_key(["kode", "ar_tertial"]) }}
             as segment_id_per_ar_tertial,
             *,
-            fra_dato <= current_date and current_date <= til_dato as er_siste_gyldige
+            fra_dato <= current_date and current_date < til_dato as er_siste_gyldige
         from derived_columnns
     ),
 

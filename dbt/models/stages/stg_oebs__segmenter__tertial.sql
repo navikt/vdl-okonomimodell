@@ -19,8 +19,8 @@ with
         from source
         join
             tertial
-            on raw__gyldig_fra <= tertial.til_dato
-            and tertial.til_dato < coalesce(raw__gyldig_til, to_date('9999', 'yyyy'))
+            on raw__gyldig_fra < tertial.til_dato
+            and tertial.til_dato <= coalesce(raw__gyldig_til, to_date('9999', 'yyyy'))
     ),
 
     derived_columnns as (
@@ -39,7 +39,7 @@ with
             raw__posterbar = 'Y' as er_posterbar,
             raw__enabled_flag = 'Y' as er_aktiv,
             coalesce(raw__attribute19, 'N') = 'Y' as er_budsjetterbar,
-            fra_dato <= current_date and current_date <= til_dato as er_siste_gyldige,
+            fra_dato <= current_date and current_date < til_dato as er_siste_gyldige,
             cast(raw__attribute10 as varchar(200)) as attribute10,
             cast(raw__attribute11 as varchar(200)) as attribute11,
             cast(raw__attribute12 as varchar(200)) as attribute12,
@@ -52,8 +52,11 @@ with
 
     keyed as (
         select
-            {{ dbt_utils.generate_surrogate_key(["kode", "ar_tertial", "segment_type"]) }}
-            as _uid,
+            {{
+                dbt_utils.generate_surrogate_key(
+                    ["kode", "ar_tertial", "segment_type"]
+                )
+            }} as _uid,
             {{ dbt_utils.generate_surrogate_key(["kode", "ar_tertial"]) }}
             as segment_id_per_ar_tertial,
             {{ dbt_utils.generate_surrogate_key(["kode"]) }} as segment_id,
