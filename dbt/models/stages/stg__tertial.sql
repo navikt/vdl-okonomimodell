@@ -20,14 +20,18 @@ with
     tertial as (
 
         select
-            periodenummer - 3 as fra_periode,
-            periodenummer as til_periode,
             ar,
             nummer,
             lag(til_dato, 1, to_date(to_varchar(ar), 'yyyy')) over (
                 partition by ar order by nummer
             ) as fra_dato,
             til_dato,
+            cast(
+                year(fra_dato) || trim(to_varchar(month(fra_dato), '00')) as number
+            ) as fra_periode,
+            cast(
+                year(til_dato) || trim(to_varchar(month(til_dato), '00')) as number
+            ) as til_periode,
             row_number() over (partition by ar order by nummer) as tertial
         from perioder
     ),
