@@ -31,7 +31,7 @@ vdl_okonomimodell_profile:
       role: "okonomimodell_transformer"
       # SSO config
       authenticator: externalbrowser
-      database: "dev_{{ env_var('USER') }}_okonomimodell"
+      database: "dev_{{ env_var('DEV_NAME') }}_okonomimodell"
       warehouse: "okonomimodell_transformer"
       schema: "PUBLIC"
       threads: 8
