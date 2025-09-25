@@ -63,4 +63,3 @@ stop-colima:
 	colima stop
 
 monday_patch: lock-file
-	infrastructure/update_container_image.sh
