@@ -1,3 +1,3 @@
 vdl-cli @ git+https://github.com/navikt/vdl-cli@v0.1
 dbt-snowflake<1.10.0,>=1.9.0
-dbt-core<1.10.0,>=1.9.0
+dbt-core<1.11.0,>=1.10.0
